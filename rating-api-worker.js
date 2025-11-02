@@ -1,5 +1,5 @@
 // Cloudflare Worker - Mock Rating Engine API
-
+// Deploy this at: https://rating-api.your-workers.dev (or custom domain)
 
 export default {
   async fetch(request, env, ctx) {
