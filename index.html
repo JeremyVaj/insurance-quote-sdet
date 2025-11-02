@@ -18,8 +18,116 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .company-logo {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2;
+        }
+        
+        .company-logo h1 {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .company-logo .company-tagline {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 10px;
+            font-style: italic;
+            letter-spacing: 4px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: rise linear infinite;
+        }
+        
+        .bubble:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            animation-duration: 15s;
+            animation-delay: 0s;
+        }
+        
+        .bubble:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            left: 25%;
+            animation-duration: 12s;
+            animation-delay: 2s;
+        }
+        
+        .bubble:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            left: 45%;
+            animation-duration: 18s;
+            animation-delay: 4s;
+        }
+        
+        .bubble:nth-child(4) {
+            width: 70px;
+            height: 70px;
+            left: 65%;
+            animation-duration: 14s;
+            animation-delay: 1s;
+        }
+        
+        .bubble:nth-child(5) {
+            width: 90px;
+            height: 90px;
+            left: 80%;
+            animation-duration: 16s;
+            animation-delay: 3s;
+        }
+        
+        .bubble:nth-child(6) {
+            width: 50px;
+            height: 50px;
+            left: 35%;
+            animation-duration: 13s;
+            animation-delay: 5s;
+        }
+        
+        .bubble:nth-child(7) {
+            width: 75px;
+            height: 75px;
+            left: 55%;
+            animation-duration: 17s;
+            animation-delay: 2.5s;
+        }
+        
+        @keyframes rise {
+            0% {
+                bottom: -100px;
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(100px);
+            }
+            100% {
+                bottom: 110vh;
+                transform: translateX(-100px);
+            }
         }
         
         .content-wrapper {
@@ -28,6 +136,9 @@
             align-items: center;
             justify-content: center;
             width: 100%;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
         }
         
         .container {
@@ -38,6 +149,33 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 40px;
             animation: slideIn 0.5s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .company-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .company-logo h1 {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .company-logo .company-tagline {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 8px;
+            font-style: italic;
+            letter-spacing: 3px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
         
         @keyframes slideIn {
@@ -214,10 +352,13 @@
             color: rgba(255, 255, 255, 0.8);
             font-size: 12px;
             font-style: italic;
-            text-align: center;
+            text-align: right;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            width: 100%;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            z-index: 10;
         }
         
         @media (max-width: 768px) {
@@ -232,6 +373,19 @@
     </style>
 </head>
 <body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    
+    <div class="company-logo">
+        <h1>Very Good Insurance</h1>
+        <div class="company-tagline">EXCELLENCE IN COVERAGE</div>
+    </div>
+    
     <div class="content-wrapper">
         <div class="container">
             <h1>Insurance Coverage Selector</h1>
