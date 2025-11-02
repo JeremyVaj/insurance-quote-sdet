@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coverage Options Selector</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .container {
+            background: white;
+            max-width: 650px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: white;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+        
+        select:hover {
+            border-color: #cbd5e0;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .coverage-options {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .coverage-options.visible {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .coverage-option {
+            padding: 16px 20px;
+            margin: 12px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            position: relative;
+        }
+        
+        .coverage-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        .coverage-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f7f9ff 0%, #e8ebff 100%);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .coverage-option.selected::after {
+            content: "✓";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .coverage-option input[type="radio"] {
+            width: auto;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        .coverage-option strong {
+            color: #2d3748;
+            font-size: 16px;
+        }
+        
+        .coverage-option label {
+            display: inline;
+            font-weight: normal;
+            color: #718096;
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: normal;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .info-message {
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .v1-warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left-color: #f59e0b;
+            color: #92400e;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .demo-footer {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            font-style: italic;
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="container">
+            <h1>Insurance Coverage Selector</h1>
+            <p class="subtitle">Choose your state to view available coverage options</p>
+            
+            <div class="form-group">
+                <label for="state-select">Select Your State:</label>
+                <select id="state-select" data-testid="state-select">
+                    <option value="">-- Select a State --</option>
+                    <option value="WI">Wisconsin (WI)</option>
+                    <option value="OH">Ohio (OH)</option>
+                    <option value="IL">Illinois (IL)</option>
+                    <option value="NV">Nevada (NV)</option>
+                    <option value="TX">Texas (TX)</option>
+                    <option value="NY">New York (NY)</option>
+                    <option value="CA">California (CA)</option>
+                </select>
+            </div>
+
+            <div id="coverage-container" class="coverage-options" data-testid="coverage-container">
+                <h2>Select Coverage Option</h2>
+                <div class="info-message">
+                    🎉 New coverage options are available in your state!
+                </div>
+                
+                <div class="coverage-option" data-testid="coverage-none">
+                    <input type="radio" id="none" name="coverage" value="none" checked>
+                    <label for="none">
+                        <strong>None</strong> — No additional coverage
+                    </label>
+                </div>
+
+                <div class="coverage-option" data-testid="coverage-silver">
+                    <input type="radio" id="silver" name="coverage" value="silver">
+                    <label for="silver">
+                        <strong>Silver</strong> — Basic coverage package
+                    </label>
+                </div>
+
+                <div class="coverage-option" data-testid="coverage-gold">
+                    <input type="radio" id="gold" name="coverage" value="gold">
+                    <label for="gold">
+                        <strong>Gold</strong> — Enhanced coverage package
+                    </label>
+                </div>
+
+                <div class="coverage-option" data-testid="coverage-platinum">
+                    <input type="radio" id="platinum" name="coverage" value="platinum">
+                    <label for="platinum">
+                        <strong>Platinum</strong> — Premium coverage package
+                    </label>
+                </div>
+            </div>
+
+            <div id="v1-message" class="info-message v1-warning hidden" data-testid="v1-message">
+                ⚠️ Coverage options are currently available only in select states. Your state does not have access to these new options at this time.
+            </div>
+        </div>
+    </div>
+    
+    <div class="demo-footer">
+        * This is not a real insurance product. Demo project created by Jeremy Vajko.
+    </div>
+
+    <script>
+        // Define V2 states (customers who see new coverage options)
+        const V2_STATES = ['WI', 'OH', 'IL', 'NV'];
+        
+        // Define V1 states (customers who do NOT see new coverage options)
+        const V1_STATES = ['TX', 'NY', 'CA'];
+
+        const stateSelect = document.getElementById('state-select');
+        const coverageContainer = document.getElementById('coverage-container');
+        const v1Message = document.getElementById('v1-message');
+        const coverageOptions = document.querySelectorAll('.coverage-option');
+
+        // Handle state selection change
+        stateSelect.addEventListener('change', function() {
+            const selectedState = this.value;
+            
+            if (!selectedState) {
+                // No state selected - hide everything
+                coverageContainer.classList.remove('visible');
+                v1Message.classList.add('hidden');
+                return;
+            }
+
+            if (V2_STATES.includes(selectedState)) {
+                // V2 customer - show coverage options
+                coverageContainer.classList.add('visible');
+                v1Message.classList.add('hidden');
+                
+                // Reset to "None" as default
+                document.getElementById('none').checked = true;
+                updateSelectedStyle();
+            } else if (V1_STATES.includes(selectedState)) {
+                // V1 customer - hide coverage options, show message
+                coverageContainer.classList.remove('visible');
+                v1Message.classList.remove('hidden');
+            }
+        });
+
+        // Add visual feedback for selected coverage option
+        coverageOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                updateSelectedStyle();
+            });
+        });
+
+        // Handle radio button changes
+        document.querySelectorAll('input[name="coverage"]').forEach(radio => {
+            radio.addEventListener('change', updateSelectedStyle);
+        });
+
+        function updateSelectedStyle() {
+            coverageOptions.forEach(option => {
+                const radio = option.querySelector('input[type="radio"]');
+                if (radio.checked) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+
+        // Initialize the selected style
+        updateSelectedStyle();
+    </script>
+</body>
+</html>
