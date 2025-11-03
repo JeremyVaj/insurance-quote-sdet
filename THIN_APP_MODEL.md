@@ -149,45 +149,6 @@ test('user gets quote for retail business', async ({ page }) => {
 - 5-10 lines per test
 - Highly readable
 
-### Pattern 2: With Classic POM (Optional)
-
-```javascript
-class QuoteCalculatorPage {
-  async fillAndSubmitQuote({ state, businessType, revenue, coverage }) {
-    await this.page.getByLabel('Customer state').selectOption(state);
-    await this.page.getByLabel('Business type').selectOption(businessType);
-    await this.page.getByLabel('Annual revenue').fill(String(revenue));
-    await this.page.getByLabel(`Coverage ${coverage}`).check();
-    await this.page.getByLabel('Submit quote').click();
-  }
-  
-  async getPremiumAmount() {
-    const text = await this.page.getByLabel('Premium amount').textContent();
-    return parseFloat(text.replace(/[$,]/g, ''));
-  }
-}
-
-test('user gets quote', async ({ page }) => {
-  const calculator = new QuoteCalculatorPage(page);
-  
-  await calculator.fillAndSubmitQuote({
-    state: 'WI',
-    businessType: 'retail',
-    revenue: 50000,
-    coverage: 'none'
-  });
-  
-  const premium = await calculator.getPremiumAmount();
-  expect(premium).toBeGreaterThan(1000);
-});
-```
-
-**Characteristics:**
-- Light abstraction layer
-- Reusable methods
-- Still uses generic labels
-- Good for repeated workflows
-
 ---
 
 ## Test Organization
@@ -196,12 +157,10 @@ test('user gets quote', async ({ page }) => {
 ```
 tests/
 ├── api/                              # API contract tests
-│   ├── helpers/RatingEngineAPI.js   # Minimal API helper
 │   └── rating-engine.spec.js        # 15 API tests
 │
 └── integration/                      # UI flow tests
-    ├── user-flows-refactored.spec.js # 32 Thin App Model tests
-    └── pom-example.spec.js           # 6 Classic POM tests (optional)
+    └── user-flows.spec.js           # 27 Thin App Model tests
 ```
 
 ### Test Categories
@@ -379,12 +338,6 @@ npm test
 # Only integration tests
 npm run test:integration
 
-# Only Thin App Model tests
-npx playwright test user-flows-refactored
-
-# Only POM example tests
-npx playwright test pom-example
-
 # Only API tests
 npm run test:api
 ```
@@ -398,9 +351,6 @@ npm run test:api
 
 ### Q: What if the visible text changes?
 **A:** Use `aria-label` to keep the test selector stable while allowing UI text to change.
-
-### Q: Can I still use Page Objects?
-**A:** Yes! See `pom-example.spec.js`. The POM just wraps the same generic labels.
 
 ### Q: What about CSS/ID selectors?
 **A:** Avoid them. They're brittle and don't support accessibility.
@@ -419,6 +369,5 @@ npm run test:api
 ✅ Readable tests  
 ✅ No test-specific attributes  
 ✅ Single source of truth  
-✅ Works with or without POMs  
 
 **Result:** Better accessibility, more maintainable tests, clearer intent.

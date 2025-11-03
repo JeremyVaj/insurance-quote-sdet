@@ -2,8 +2,9 @@
 // API Tests - Backend Contract Validation
 // Tests edge cases and validation that the UI cannot reach
 
-import { test, expect } from './apiFixtures.js';
-import { INVALID_REQUESTS } from './testData.js';
+import { test, expect } from '@playwright/test';
+
+const API_URL = process.env.API_BASE_URL || 'https://rating-api.jeremy-vajko.workers.dev/';
 
 // ============================================
 // VALIDATION TESTS (10 tests)
@@ -12,76 +13,98 @@ import { INVALID_REQUESTS } from './testData.js';
 
 test.describe('API Validation - Edge Cases UI Cannot Reach', () => {
   
-  test('should reject negative revenue', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.negativeRevenue);
+  test('should reject negative revenue', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: -5000, state: 'CA', business: 'retail' }
+    });
     
-    expect(result.status).toBe(400);
-    ratingAPI.verifyErrorResponse(result, 'Invalid revenue', 400);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Invalid revenue/i);
   });
 
-  test('should reject string revenue', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.stringRevenue);
+  test('should reject string revenue', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: 'fifty thousand', state: 'CA', business: 'retail' }
+    });
     
-    expect(result.status).toBe(400);
-    ratingAPI.verifyErrorResponse(result, 'Invalid revenue', 400);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Invalid revenue/i);
   });
 
-  test('should reject null revenue', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.nullRevenue);
+  test('should reject null revenue', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: null, state: 'CA', business: 'retail' }
+    });
     
-    expect(result.status).toBe(400);
-    expect(result.body.error).toMatch(/Invalid revenue|Missing required fields/);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Invalid revenue|Missing required fields/i);
   });
 
-  test('should reject missing revenue field', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.missingRevenue);
+  test('should reject missing revenue field', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { state: 'CA', business: 'retail' }
+    });
     
-    expect(result.status).toBe(400);
-    ratingAPI.verifyErrorResponse(result, 'Missing required fields', 400);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Missing required fields/i);
   });
 
-  test('should reject missing state field', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.missingState);
+  test('should reject missing state field', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: 50000, business: 'retail' }
+    });
     
-    expect(result.status).toBe(400);
-    ratingAPI.verifyErrorResponse(result, 'Missing required fields', 400);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Missing required fields/i);
   });
 
-  test('should reject missing business field', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.missingBusiness);
+  test('should reject missing business field', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: 50000, state: 'CA' }
+    });
     
-    expect(result.status).toBe(400);
-    ratingAPI.verifyErrorResponse(result, 'Missing required fields', 400);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Missing required fields/i);
   });
 
-  test('should reject empty request body', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.emptyBody);
+  test('should reject empty request body', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: {}
+    });
     
-    expect(result.status).toBe(400);
-    ratingAPI.verifyErrorResponse(result, 'Missing required fields', 400);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Missing required fields/i);
   });
 
-  test('should reject invalid state code', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.invalidState);
+  test('should reject invalid state code', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: 50000, state: 'ZZ', business: 'retail' }
+    });
     
-    expect(result.status).toBe(400);
-    ratingAPI.verifyErrorResponse(result, 'Invalid state', 400);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Invalid state/i);
   });
 
-  test('should reject invalid business type', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote(INVALID_REQUESTS.invalidBusiness);
+  test('should reject invalid business type', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: 50000, state: 'CA', business: 'technology' }
+    });
     
-    expect(result.status).toBe(400);
-    ratingAPI.verifyErrorResponse(result, 'Invalid business type', 400);
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/Invalid business type/i);
   });
 
   test('should reject GET request (wrong HTTP method)', async ({ request }) => {
-    const baseURL = process.env.API_BASE_URL || 'https://rating-api.jeremy-vajko.workers.dev/';
-    
-    const response = await request.get(baseURL, {
-      failOnStatusCode: false,
-    });
-    
+    const response = await request.get(API_URL);
     expect(response.status()).toBe(405);
   });
 });
@@ -93,42 +116,40 @@ test.describe('API Validation - Edge Cases UI Cannot Reach', () => {
 
 test.describe('API Response Structure', () => {
   
-  test('success response should have all required fields', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote({
-      revenue: 50000,
-      state: 'CA',
-      business: 'retail',
+  test('success response should have all required fields', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: 50000, state: 'CA', business: 'retail' }
     });
     
-    expect(result.status).toBe(200);
-    ratingAPI.verifySuccessResponse(result);
+    expect(response.status()).toBe(200);
+    const body = await response.json();
     
-    expect(result.body).toHaveProperty('premium');
-    expect(result.body).toHaveProperty('quoteId');
-    expect(result.body).toHaveProperty('calculatedAt');
+    expect(body).toHaveProperty('premium');
+    expect(body).toHaveProperty('quoteId');
+    expect(body).toHaveProperty('calculatedAt');
   });
 
-  test('premium should be a number', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote({
-      revenue: 50000,
-      state: 'CA',
-      business: 'retail',
+  test('premium should be a number', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: 50000, state: 'CA', business: 'retail' }
     });
     
-    expect(result.status).toBe(200);
-    expect(typeof result.body.premium).toBe('number');
-    expect(result.body.premium).toBeGreaterThanOrEqual(0);
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    
+    expect(typeof body.premium).toBe('number');
+    expect(body.premium).toBeGreaterThanOrEqual(0);
   });
 
-  test('quoteId should match format Q-timestamp-random', async ({ ratingAPI }) => {
-    const result = await ratingAPI.getQuote({
-      revenue: 50000,
-      state: 'CA',
-      business: 'retail',
+  test('quoteId should match format Q-timestamp-random', async ({ request }) => {
+    const response = await request.post(API_URL, {
+      data: { revenue: 50000, state: 'CA', business: 'retail' }
     });
     
-    expect(result.status).toBe(200);
-    expect(result.body.quoteId).toMatch(/^Q-\d+-[A-Z0-9]+$/);
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    
+    expect(body.quoteId).toMatch(/^Q-\d+-[A-Z0-9]+$/);
   });
 });
 
@@ -139,39 +160,39 @@ test.describe('API Response Structure', () => {
 
 test.describe('API Business Logic', () => {
   
-  test('quote IDs should be unique across requests', async ({ ratingAPI }) => {
+  test('quote IDs should be unique across requests', async ({ request }) => {
     const quoteIds = new Set();
     
     for (let i = 0; i < 3; i++) {
-      const result = await ratingAPI.getQuote({
-        revenue: 50000,
-        state: 'CA',
-        business: 'retail',
+      const response = await request.post(API_URL, {
+        data: { revenue: 50000, state: 'CA', business: 'retail' }
       });
       
-      expect(result.status).toBe(200);
-      expect(quoteIds.has(result.body.quoteId)).toBe(false);
-      quoteIds.add(result.body.quoteId);
+      expect(response.status()).toBe(200);
+      const body = await response.json();
+      
+      expect(quoteIds.has(body.quoteId)).toBe(false);
+      quoteIds.add(body.quoteId);
     }
     
     expect(quoteIds.size).toBe(3);
   });
 
-  test('same inputs should produce consistent premium', async ({ ratingAPI }) => {
-    const result1 = await ratingAPI.getQuote({
-      revenue: 50000,
-      state: 'CA',
-      business: 'retail',
+  test('same inputs should produce consistent premium', async ({ request }) => {
+    const response1 = await request.post(API_URL, {
+      data: { revenue: 50000, state: 'CA', business: 'retail' }
     });
     
-    const result2 = await ratingAPI.getQuote({
-      revenue: 50000,
-      state: 'CA',
-      business: 'retail',
+    const response2 = await request.post(API_URL, {
+      data: { revenue: 50000, state: 'CA', business: 'retail' }
     });
     
-    expect(result1.status).toBe(200);
-    expect(result2.status).toBe(200);
-    expect(result1.body.premium).toBe(result2.body.premium);
+    expect(response1.status()).toBe(200);
+    expect(response2.status()).toBe(200);
+    
+    const body1 = await response1.json();
+    const body2 = await response2.json();
+    
+    expect(body1.premium).toBe(body2.premium);
   });
 });

@@ -55,10 +55,7 @@ await page.getByLabel('Submit quote').click();
 insurance-quote-sdet/
 ├── tests/
 │   ├── api/                                    # API Tests (15 tests)
-│   │   ├── helpers/RatingEngineAPI.js         # Minimal API helper (~90 lines)
-│   │   ├── apiFixtures.js                     # Playwright fixtures
-│   │   ├── testData.js                        # Test data
-│   │   └── rating-engine.spec.js              # All API tests
+│   │   └── rating-engine.spec.js              # All API tests in one file
 │   │
 │   └── integration/                            # Integration Tests (27 tests)
 │       └── user-flows.spec.js                 # Flow-based UI tests
@@ -196,18 +193,19 @@ const premium = await page.getByLabel('Premium amount').textContent();
 - Readable - tests are self-documenting
 - No test-specific attributes needed
 
-### 2. Minimal API Helper (Not Full POM)
+### 2. Simple API Tests
 
 ```javascript
-// Just 90 lines - wraps HTTP calls only
-class RatingEngineAPI {
-  async getQuote(data)
-  verifySuccessResponse(result)
-  verifyErrorResponse(result)
-}
+// Just straightforward Playwright request API
+test('should reject negative revenue', async ({ request }) => {
+  const response = await request.post(API_URL, {
+    data: { revenue: -5000, state: 'CA', business: 'retail' }
+  });
+  expect(response.status()).toBe(400);
+});
 ```
 
-**Why:** Simple, focused, easy to maintain
+**Why:** Simple, direct, no over-engineering needed
 
 ### 3. Flow-Based Test Organization
 
@@ -228,7 +226,7 @@ user-flows.spec.js → Organized by user journeys
 ✅ **Thin App Model** - Accessibility-first testing without test-specific IDs  
 ✅ **Flow-Based Tests** - Organized by user journeys, not implementation  
 ✅ **Generic Selectors** - Stable, screen-reader-friendly labels  
-✅ **Minimal Helpers** - No over-engineered Page Objects  
+✅ **Simple API Tests** - Direct, no over-engineering  
 ✅ **Modern Patterns** - Playwright's `getByLabel()` and `getByRole()`  
 ✅ **Dual Approach** - API contract tests + UI flow tests  
 ✅ **Clean Code** - Readable, maintainable, well-organized  
