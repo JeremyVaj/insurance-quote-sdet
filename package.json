@@ -1,0 +1,21 @@
+{
+  "name": "coterie-sdet-project",
+  "version": "1.0.0",
+  "description": "Sr SDET Take-Home Project - Rating Engine API and Coverage Selector Tests",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test tests/api",
+    "test:integration": "playwright test tests/integration",
+    "test:all": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report playwright-report"
+  },
+  "keywords": ["testing", "playwright", "api", "e2e"],
+  "author": "Jeremy Vajko",
+  "license": "ISC",
+  "dependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}
