@@ -51,8 +51,7 @@ test.describe('User Flow: Form Validation', () => {
   test('V1 state shows unavailable coverage notice', async ({ page }) => {
     await page.getByLabel('Customer state').selectOption('TX');
     
-    const notice = page.getByRole('alert').filter({ hasText: 'not available' });
-    await expect(notice).toBeVisible();
+    await expect(page.getByLabel('Coverage unavailable notice')).toBeVisible();
   });
 
   test('V2 state shows coverage options', async ({ page }) => {
