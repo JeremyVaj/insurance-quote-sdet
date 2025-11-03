@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Very Good Insurance Company</title>
+  <title>Jeremy Very Good Insurance Company</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Space Mono font -->
@@ -16,6 +16,8 @@
     .space-mono-regular-italic { font-family:"Space Mono",monospace; font-weight:400; font-style:italic; }
     .space-mono-bold-italic { font-family:"Space Mono",monospace; font-weight:700; font-style:italic; }
 
+    * { box-sizing: border-box; }
+    
     html, body { margin:0; padding:0; font-size:100%; }
     body{
       font-family:"Space Mono",monospace;
@@ -70,16 +72,11 @@
 
     header{text-align:center; margin-bottom:20px; line-height:1.1;}
     header h1{
-      font-size:3.6rem; margin:0;
+      font-size:3.2rem; margin:0;
       background:linear-gradient(135deg,#ffffff 0%,#dcd3ff 40%,#b09aff 100%);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
     }
-    header h2{
-      margin:8px 0 0;
-      font-size:2rem;
-      color:#f4f4ff;
-      font-weight:400;
-    }
+    header h2{ margin:8px 0 0; font-size:1.6rem; color:#f4f4ff; font-weight:400; }
 
     .card{
       width:100%; max-width:920px;
@@ -98,15 +95,12 @@
     label{ display:block; margin:10px 0 6px; color:#374151; font-size:14px; }
 
     select, input[type="number"]{
-      width:100%;
-      padding:12px 14px;
-      border:2px solid #e5e7eb;
-      border-radius:12px;
-      font-size:16px;
-      background:#fff;
+      width:100%; padding:12px 14px;
+      border:2px solid #e5e7eb; border-radius:12px;
+      font-size:16px; background:#fff;
       transition:border-color .2s, box-shadow .2s;
       font-family:"Space Mono",monospace;
-      box-sizing:border-box; /* keep boxes inside their grid cell */
+      box-sizing:border-box; /* Ensure padding/border included in width */
     }
     select:focus, input[type="number"]:focus{
       outline:none; border-color:#667eea;
@@ -128,6 +122,7 @@
     .coverage-option label{ margin:0; font-size:14px; }
 
     .row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .row > div { min-width: 0; } /* Prevents grid children from overflowing */
     @media(max-width:760px){ .row{ grid-template-columns:1fr; } }
 
     .btn{
@@ -175,14 +170,12 @@
 
   <main class="card">
     <h3 class="space-mono-bold-italic"><span>Insurance Quote & Coverage</span></h3>
-    <div class="sub space-mono-regular-italic">
-      Get a very good quote from a very good company run by a very good guy named Jeremy.
-    </div>
+    <div class="sub space-mono-regular-italic">"Get a very good quote from a very good guy named Jeremy."</div>
 
-    <form id="quoteForm" novalidate aria-label="form.quote">
+    <form id="quoteForm" novalidate>
       <fieldset>
         <label for="state" class="space-mono-regular-italic">Customer State</label>
-        <select id="state" required aria-label="state.select">
+        <select id="state" required aria-label="Customer state">
           <option value="">-- Select State --</option>
           <option value="WI">Wisconsin (WI)</option>
           <option value="OH">Ohio (OH)</option>
@@ -192,29 +185,29 @@
           <option value="NY">New York (NY)</option>
           <option value="CA">California (CA)</option>
         </select>
-        <div id="v1Notice" class="notice warn" style="display:none" role="region" aria-label="message.v1">
-          New coverage options are not available in your state, but your quote will still be very good.
+        <div id="v1Notice" class="notice warn" style="display:none" role="alert">
+          Sorry, new coverages aren't available where you live — but your quote will still be very good!
         </div>
       </fieldset>
 
-      <fieldset id="coverageFieldset" class="coverage" aria-hidden="true" role="radiogroup" aria-label="coverage.group">
+      <fieldset id="coverageFieldset" class="coverage" aria-hidden="true" role="radiogroup" aria-label="Coverage options">
         <div class="notice space-mono-regular-italic" style="margin-bottom:10px">
-          New coverage options are available in your state.
+          Lucky you! New coverage options are available in your state.
         </div>
         <div class="coverage-option">
-          <input type="radio" id="cov-none" name="coverage" value="none" checked aria-label="coverage.none" />
+          <input type="radio" id="cov-none" name="coverage" value="none" checked aria-label="Coverage none" />
           <label for="cov-none"><strong>None</strong> — No additional coverage</label>
         </div>
         <div class="coverage-option">
-          <input type="radio" id="cov-silver" name="coverage" value="silver" aria-label="coverage.silver" />
+          <input type="radio" id="cov-silver" name="coverage" value="silver" aria-label="Coverage silver" />
           <label for="cov-silver"><strong>Silver</strong> — Basic coverage package</label>
         </div>
         <div class="coverage-option">
-          <input type="radio" id="cov-gold" name="coverage" value="gold" aria-label="coverage.gold" />
+          <input type="radio" id="cov-gold" name="coverage" value="gold" aria-label="Coverage gold" />
           <label for="cov-gold"><strong>Gold</strong> — Enhanced coverage package</label>
         </div>
         <div class="coverage-option">
-          <input type="radio" id="cov-platinum" name="coverage" value="platinum" aria-label="coverage.platinum" />
+          <input type="radio" id="cov-platinum" name="coverage" value="platinum" aria-label="Coverage platinum" />
           <label for="cov-platinum"><strong>Platinum</strong> — Premium coverage package</label>
         </div>
       </fieldset>
@@ -222,7 +215,7 @@
       <fieldset class="row">
         <div>
           <label for="business" class="space-mono-regular-italic">Business Type</label>
-          <select id="business" required aria-label="business.select">
+          <select id="business" required aria-label="Business type">
             <option value="">-- Select Business Type --</option>
             <option value="retail">Retail</option>
             <option value="restaurant">Restaurant</option>
@@ -232,37 +225,36 @@
         </div>
         <div>
           <label for="revenue" class="space-mono-regular-italic">Annual Revenue ($)</label>
-          <input type="number" id="revenue" inputmode="numeric" min="0" placeholder="50000" required aria-label="revenue.input" />
+          <input type="number" id="revenue" inputmode="numeric" min="0" placeholder="50000" required aria-label="Annual revenue" />
         </div>
       </fieldset>
 
-      <button type="submit" class="btn" id="submitButton" disabled aria-label="submit.get-quote">
+      <button type="submit" class="btn" id="submitButton" disabled aria-label="Submit quote">
         Get Quote
       </button>
 
-      <div class="loading" id="loading" role="status" aria-live="polite" aria-label="result.loading">
+      <div class="loading" id="loading" role="status" aria-live="polite" aria-label="Loading">
         Calculating your quote…
       </div>
 
-      <section class="result" id="quoteResult" role="region" aria-label="result.quote">
+      <section class="result" id="quoteResult" role="region" aria-label="Quote result">
         <div class="space-mono-bold-italic" style="margin-bottom:6px;">Your Insurance Quote</div>
-        <div class="premium space-mono-bold" aria-label="result.premium">$0.00</div>
+        <div class="premium space-mono-bold" aria-label="Premium amount">$0.00</div>
         <div class="muted space-mono-regular-italic">Annual Premium</div>
-        <div class="muted" aria-label="result.quoteId">Quote ID:</div>
-        <div class="muted" aria-label="result.timestamp"></div>
+        <div class="muted" aria-label="Quote ID"></div>
+        <div class="muted" aria-label="Quote timestamp"></div>
       </section>
 
-      <div class="error" id="error" role="region" aria-label="result.error">
-        <strong>Error:</strong> <span id="errorText" aria-label="result.error.message"></span>
+      <div class="error" id="error" role="alert" aria-label="Error message">
+        <strong>Error:</strong> <span id="errorText"></span>
       </div>
     </form>
   </main>
 
   <footer>
     <em>
-      For more information about purchasing your quoted price, contact Jeremy at
-      <a href="https://jeremyvajko.com">JeremyVajko.com</a> —
-      though he'll probably tell you he doesn't actually sell insurance, because this is just a demo project.
+      For more information about purchasing your quoted price, contact Jeremy at 
+      <a href="https://jeremyvajko.com">JeremyVajko.com</a>
     </em>
   </footer>
 
@@ -278,81 +270,58 @@
           n=document.getElementById('v1Notice'),
           load=document.getElementById('loading'),
           res=document.getElementById('quoteResult'),
-          prem=res.querySelector('[aria-label="result.premium"]'),
-          qid=res.querySelector('[aria-label="result.quoteId"]'),
-          ts=res.querySelector('[aria-label="result.timestamp"]'),
+          prem=res.querySelector('[aria-label="Premium amount"]'),
+          qid=res.querySelector('[aria-label="Quote ID"]'),
+          ts=res.querySelector('[aria-label="Quote timestamp"]'),
           err=document.getElementById('error'),
           errTxt=document.getElementById('errorText');
 
-    function covVal(){
-      const x=document.querySelector('input[name="coverage"]:checked');
-      return x?x.value:null;
-    }
-
+    function covVal(){const x=document.querySelector('input[name="coverage"]:checked');return x?x.value:null;}
     function showHide(){
       const val=s.value;
-      if(V2.includes(val)){
-        c.classList.add('visible');
-        c.setAttribute('aria-hidden','false');
-        n.style.display='none';
-      } else if(V1.includes(val)){
-        c.classList.remove('visible');
-        c.setAttribute('aria-hidden','true');
-        n.style.display='block';
-      } else {
-        c.classList.remove('visible');
-        c.setAttribute('aria-hidden','true');
-        n.style.display='none';
-      }
+      if(V2.includes(val)){c.classList.add('visible');c.setAttribute('aria-hidden','false');n.style.display='none';}
+      else if(V1.includes(val)){c.classList.remove('visible');c.setAttribute('aria-hidden','true');n.style.display='block';}
+      else{c.classList.remove('visible');c.setAttribute('aria-hidden','true');n.style.display='none';}
       toggleBtn();
     }
-
     function toggleBtn(){
-      const hasBasics = b.value!=='' && r.value!=='' && Number(r.value)>=0;
-      const isV2 = V2.includes(s.value);
-      const isV1 = V1.includes(s.value);
-
-      const ready = (isV2 && covVal() && hasBasics) || (isV1 && hasBasics);
-      btn.disabled = !ready;
+      // V2 states need coverage selected, V1 states don't
+      const hasAllFields = s.value!=='' && b.value!=='' && r.value!=='' && Number(r.value)>=0;
+      
+      if(V2.includes(s.value)){
+        // V2 state: require coverage selection
+        btn.disabled = !(hasAllFields && covVal());
+      } else if(V1.includes(s.value)){
+        // V1 state: just need basic fields
+        btn.disabled = !hasAllFields;
+      } else {
+        // No state selected
+        btn.disabled = true;
+      }
     }
-
     [s,b,r].forEach(el=>el.addEventListener('input',toggleBtn));
     s.addEventListener('change',showHide);
     document.querySelectorAll('input[name="coverage"]').forEach(x=>x.addEventListener('change',toggleBtn));
-
     f.addEventListener('submit',async e=>{
       e.preventDefault();
-      res.classList.remove('show');
-      err.classList.remove('show');
-      load.classList.add('show');
-
+      res.classList.remove('show');err.classList.remove('show');load.classList.add('show');
       const payload={revenue:Number(r.value),state:s.value,business:b.value};
       try{
-        const resp=await fetch(API,{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify(payload)
-        });
-        const data=await resp.json();
-        load.classList.remove('show');
+        const resp=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+        const data=await resp.json();load.classList.remove('show');
         if(resp.ok){
           prem.textContent=`$${Number(data.premium).toFixed(2)}`;
           qid.textContent=`Quote ID: ${data.quoteId||''}`;
           ts.textContent=data.calculatedAt?`Generated: ${new Date(data.calculatedAt).toLocaleString()}`:'';
           res.classList.add('show');
         }else{
-          errTxt.textContent=data.message||data.error||'Request failed';
-          err.classList.add('show');
+          errTxt.textContent=data.message||data.error||'Request failed';err.classList.add('show');
         }
       }catch{
-        load.classList.remove('show');
-        errTxt.textContent='Network error';
-        err.classList.add('show');
+        load.classList.remove('show');errTxt.textContent='Network error';err.classList.add('show');
       }
     });
-
-    showHide();
-    toggleBtn();
+    showHide();toggleBtn();
   </script>
 </body>
 </html>

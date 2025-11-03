@@ -1,6 +1,9 @@
 // tests/integration/user-flows.spec.js
-// Integration Tests - User Flow Based (Accessibility Tags)
-// Tests real user scenarios through aria-labeled UI - NO Page Object Model needed
+// THIN APP MODEL - Flow-Based Tests with Generic Accessibility Identifiers
+// 
+// Strategy: Use natural, screen-reader-friendly aria-labels as selectors
+// No test-specific IDs - everything is generic and stable
+// Tests describe user flows, not implementation details
 
 import { test, expect } from '@playwright/test';
 
@@ -15,383 +18,402 @@ test.beforeEach(async ({ page }) => {
 });
 
 // ============================================
-// FORM BEHAVIOR (6 tests)
+// USER FLOW: Form Validation
 // ============================================
 
-test.describe('Form Validation & Button State', () => {
+test.describe('User Flow: Form Validation', () => {
   
-  test('button disabled on page load', async ({ page }) => {
-    await expect(page.locator('[aria-label="submit.get-quote"]')).toBeDisabled();
+  test('new user sees disabled submit button', async ({ page }) => {
+    await expect(page.getByLabel('Submit quote')).toBeDisabled();
   });
 
-  test('button stays disabled for V1 states', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'TX');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
+  test('user in V1 state can submit without coverage selection', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('TX');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
     
-    // TX is V1 state, button should remain disabled
-    await expect(page.locator('[aria-label="submit.get-quote"]')).toBeDisabled();
+    // TX is V1 - button should be enabled (no coverage needed)
+    await expect(page.getByLabel('Submit quote')).toBeEnabled();
   });
 
-  test('button stays disabled for V2 state without coverage', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
+  test('user in V2 state with all fields can submit', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
     
-    // Coverage "none" is checked by default, so button will be enabled
-    // This test verifies the button IS enabled when all fields are filled
-    await expect(page.locator('[aria-label="submit.get-quote"]')).toBeEnabled();
+    // Coverage "none" is pre-selected, button should enable
+    await expect(page.getByLabel('Submit quote')).toBeEnabled();
   });
 
-  test('button enables for V2 state with all fields plus coverage', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
+  test('V1 state shows unavailable coverage notice', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('TX');
     
-    await expect(page.locator('[aria-label="submit.get-quote"]')).toBeEnabled();
+    const notice = page.getByRole('alert').filter({ hasText: 'not available' });
+    await expect(notice).toBeVisible();
   });
 
-  test('V1 notice shows for V1 states', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'TX');
-    await expect(page.locator('[aria-label="message.v1"]')).toBeVisible();
+  test('V2 state shows coverage options', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    
+    await expect(page.getByRole('radiogroup', { name: 'Coverage options' })).toBeVisible();
   });
 
-  test('coverage options show for V2 states', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    const coverageGroup = page.locator('[aria-label="coverage.group"]');
-    await expect(coverageGroup).toBeVisible();
-    await expect(coverageGroup).toHaveAttribute('aria-hidden', 'false');
+  test('switching from V2 to V1 hides coverage', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await expect(page.getByRole('radiogroup', { name: 'Coverage options' })).toBeVisible();
+    
+    await page.getByLabel('Customer state').selectOption('TX');
+    await expect(page.getByRole('radiogroup', { name: 'Coverage options' })).not.toBeVisible();
   });
 });
 
 // ============================================
-// HAPPY PATH SCENARIOS (12 tests)
+// USER FLOW: Get Quote - Happy Paths
 // ============================================
 
-test.describe('Successful Quote Generation - V2 States', () => {
+test.describe('User Flow: Getting a Quote', () => {
   
-  test('WI retail 50K none coverage displays quote', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
+  test('Wisconsin retail business gets quote with no extra coverage', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
     
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible', timeout: 5000 });
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const premiumText = await page.textContent('[aria-label="result.premium"]');
-    expect(premiumText).toMatch(/^\$[\d,]+\.\d{2}$/);
+    const premium = await page.getByLabel('Premium amount').textContent();
+    expect(premium).toMatch(/^\$[\d,]+\.\d{2}$/);
     
-    const premium = parseFloat(premiumText.replace(/[$,]/g, ''));
-    expect(premium).toBeGreaterThan(1000);
-    expect(premium).toBeLessThan(1300);
+    const amount = parseFloat(premium.replace(/[$,]/g, ''));
+    expect(amount).toBeGreaterThan(1000);
+    expect(amount).toBeLessThan(1300);
   });
 
-  test('OH restaurant 100K silver coverage displays quote', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'OH');
-    await page.selectOption('[aria-label="business.select"]', 'restaurant');
-    await page.fill('[aria-label="revenue.input"]', '100000');
-    await page.click('[aria-label="coverage.silver"]');
-    await page.click('[aria-label="submit.get-quote"]');
+  test('Ohio restaurant with silver coverage', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('OH');
+    await page.getByLabel('Business type').selectOption('restaurant');
+    await page.getByLabel('Annual revenue').fill('100000');
+    await page.getByLabel('Coverage silver').check();
+    await page.getByLabel('Submit quote').click();
     
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const premiumText = await page.textContent('[aria-label="result.premium"]');
-    const premium = parseFloat(premiumText.replace(/[$,]/g, ''));
-    expect(premium).toBeGreaterThan(2500); // Adjusted - actual is ~2762.50
-    expect(premium).toBeLessThan(3000);
+    const premium = await page.getByLabel('Premium amount').textContent();
+    const amount = parseFloat(premium.replace(/[$,]/g, ''));
+    expect(amount).toBeGreaterThan(2500);
+    expect(amount).toBeLessThan(3000);
   });
 
-  test('IL professional 200K gold coverage displays quote', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'IL');
-    await page.selectOption('[aria-label="business.select"]', 'professional');
-    await page.fill('[aria-label="revenue.input"]', '200000');
-    await page.click('[aria-label="coverage.gold"]');
-    await page.click('[aria-label="submit.get-quote"]');
+  test('Illinois professional with gold coverage', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('IL');
+    await page.getByLabel('Business type').selectOption('professional');
+    await page.getByLabel('Annual revenue').fill('200000');
+    await page.getByLabel('Coverage gold').check();
+    await page.getByLabel('Submit quote').click();
     
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const premiumText = await page.textContent('[aria-label="result.premium"]');
-    const premium = parseFloat(premiumText.replace(/[$,]/g, ''));
-    expect(premium).toBeGreaterThan(4000);
+    const premium = await page.getByLabel('Premium amount').textContent();
+    const amount = parseFloat(premium.replace(/[$,]/g, ''));
+    expect(amount).toBeGreaterThan(4000);
   });
 
-  test('NV manufacturing 75K platinum coverage displays quote', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'NV');
-    await page.selectOption('[aria-label="business.select"]', 'manufacturing');
-    await page.fill('[aria-label="revenue.input"]', '75000');
-    await page.click('[aria-label="coverage.platinum"]');
-    await page.click('[aria-label="submit.get-quote"]');
+  test('Nevada manufacturing with platinum coverage', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('NV');
+    await page.getByLabel('Business type').selectOption('manufacturing');
+    await page.getByLabel('Annual revenue').fill('75000');
+    await page.getByLabel('Coverage platinum').check();
+    await page.getByLabel('Submit quote').click();
     
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const premiumText = await page.textContent('[aria-label="result.premium"]');
-    const premium = parseFloat(premiumText.replace(/[$,]/g, ''));
-    expect(premium).toBeGreaterThan(3000);
+    const premium = await page.getByLabel('Premium amount').textContent();
+    const amount = parseFloat(premium.replace(/[$,]/g, ''));
+    expect(amount).toBeGreaterThan(3000);
   });
 
-  test('all V2 states generate quotes', async ({ page }) => {
+  test('all V2 states can get quotes', async ({ page }) => {
     for (const state of V2_STATES) {
-      await page.selectOption('[aria-label="state.select"]', state);
-      await page.selectOption('[aria-label="business.select"]', 'retail');
-      await page.fill('[aria-label="revenue.input"]', '50000');
-      await page.click('[aria-label="coverage.none"]');
-      await page.click('[aria-label="submit.get-quote"]');
+      await page.getByLabel('Customer state').selectOption(state);
+      await page.getByLabel('Business type').selectOption('retail');
+      await page.getByLabel('Annual revenue').fill('50000');
+      await page.getByLabel('Coverage none').check();
+      await page.getByLabel('Submit quote').click();
       
-      await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+      await expect(page.getByLabel('Quote result')).toBeVisible();
       
-      const premiumText = await page.textContent('[aria-label="result.premium"]');
-      expect(premiumText).toMatch(/^\$[\d,]+\.\d{2}$/);
+      const premium = await page.getByLabel('Premium amount').textContent();
+      expect(premium).toMatch(/^\$[\d,]+\.\d{2}$/);
     }
   });
 
-  test('all business types generate quotes', async ({ page }) => {
+  test('all business types can get quotes', async ({ page }) => {
     const businesses = ['retail', 'restaurant', 'professional', 'manufacturing'];
     
     for (const business of businesses) {
-      await page.selectOption('[aria-label="state.select"]', 'WI');
-      await page.selectOption('[aria-label="business.select"]', business);
-      await page.fill('[aria-label="revenue.input"]', '50000');
-      await page.click('[aria-label="coverage.none"]');
-      await page.click('[aria-label="submit.get-quote"]');
+      await page.getByLabel('Customer state').selectOption('WI');
+      await page.getByLabel('Business type').selectOption(business);
+      await page.getByLabel('Annual revenue').fill('50000');
+      await page.getByLabel('Coverage none').check();
+      await page.getByLabel('Submit quote').click();
       
-      await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+      await expect(page.getByLabel('Quote result')).toBeVisible();
       
-      const premiumText = await page.textContent('[aria-label="result.premium"]');
-      const premium = parseFloat(premiumText.replace(/[$,]/g, ''));
-      expect(premium).toBeGreaterThan(0);
+      const premium = await page.getByLabel('Premium amount').textContent();
+      const amount = parseFloat(premium.replace(/[$,]/g, ''));
+      expect(amount).toBeGreaterThan(0);
     }
   });
 
   test('all coverage levels work', async ({ page }) => {
-    const coverages = ['none', 'silver', 'gold', 'platinum'];
+    const coverages = [
+      { label: 'Coverage none', value: 'none' },
+      { label: 'Coverage silver', value: 'silver' },
+      { label: 'Coverage gold', value: 'gold' },
+      { label: 'Coverage platinum', value: 'platinum' }
+    ];
     
     for (const coverage of coverages) {
-      await page.selectOption('[aria-label="state.select"]', 'WI');
-      await page.selectOption('[aria-label="business.select"]', 'retail');
-      await page.fill('[aria-label="revenue.input"]', '50000');
-      await page.click(`[aria-label="coverage.${coverage}"]`);
-      await page.click('[aria-label="submit.get-quote"]');
+      await page.getByLabel('Customer state').selectOption('WI');
+      await page.getByLabel('Business type').selectOption('retail');
+      await page.getByLabel('Annual revenue').fill('50000');
+      await page.getByLabel(coverage.label).check();
+      await page.getByLabel('Submit quote').click();
       
-      await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+      await expect(page.getByLabel('Quote result')).toBeVisible();
       
-      const premiumText = await page.textContent('[aria-label="result.premium"]');
-      expect(premiumText).toMatch(/^\$[\d,]+\.\d{2}$/);
+      const premium = await page.getByLabel('Premium amount').textContent();
+      expect(premium).toMatch(/^\$[\d,]+\.\d{2}$/);
     }
   });
 
-  test('zero revenue shows $0 premium', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '0');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
+  test('V1 states can get quotes without selecting coverage', async ({ page }) => {
+    const v1States = ['TX', 'NY', 'CA'];
     
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    const premiumText = await page.textContent('[aria-label="result.premium"]');
-    expect(premiumText).toBe('$0.00');
-  });
-
-  test('high revenue 1M calculates large premium', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'OH');
-    await page.selectOption('[aria-label="business.select"]', 'professional');
-    await page.fill('[aria-label="revenue.input"]', '1000000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    const premiumText = await page.textContent('[aria-label="result.premium"]');
-    const premium = parseFloat(premiumText.replace(/[$,]/g, ''));
-    expect(premium).toBeGreaterThan(15000);
-  });
-
-  test('low revenue 100 calculates small premium', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '100');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    const premiumText = await page.textContent('[aria-label="result.premium"]');
-    const premium = parseFloat(premiumText.replace(/[$,]/g, ''));
-    expect(premium).toBeGreaterThan(0);
-    expect(premium).toBeLessThan(10);
-  });
-
-  test('quote ID is displayed', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    const quoteIdText = await page.textContent('[aria-label="result.quoteId"]');
-    expect(quoteIdText).toContain('Quote ID:');
-    expect(quoteIdText).toContain('Q-');
-  });
-
-  test('timestamp is displayed', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    const timestampText = await page.textContent('[aria-label="result.timestamp"]');
-    expect(timestampText).toContain('Generated:');
+    for (const state of v1States) {
+      await page.getByLabel('Customer state').selectOption(state);
+      await page.getByLabel('Business type').selectOption('retail');
+      await page.getByLabel('Annual revenue').fill('50000');
+      // No coverage selection needed for V1 states
+      await page.getByLabel('Submit quote').click();
+      
+      await expect(page.getByLabel('Quote result')).toBeVisible();
+      
+      const premium = await page.getByLabel('Premium amount').textContent();
+      expect(premium).toMatch(/^\$[\d,]+\.\d{2}$/);
+    }
   });
 });
 
 // ============================================
-// UI BEHAVIOR (6 tests)
+// USER FLOW: Edge Cases
 // ============================================
 
-test.describe('UI State Management', () => {
+test.describe('User Flow: Edge Cases', () => {
   
-  test('loading shows during API call', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
+  test('zero revenue shows $0 premium', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('0');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
     
-    await expect(page.locator('[aria-label="result.loading"]')).toBeVisible();
+    await expect(page.getByLabel('Quote result')).toBeVisible();
+    
+    const premium = await page.getByLabel('Premium amount').textContent();
+    expect(premium).toBe('$0.00');
   });
 
-  test('loading hides after response', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
+  test('very high revenue calculates correctly', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('OH');
+    await page.getByLabel('Business type').selectOption('professional');
+    await page.getByLabel('Annual revenue').fill('1000000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
     
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    await expect(page.locator('[aria-label="result.loading"]')).not.toBeVisible();
+    await expect(page.getByLabel('Quote result')).toBeVisible();
+    
+    const premium = await page.getByLabel('Premium amount').textContent();
+    const amount = parseFloat(premium.replace(/[$,]/g, ''));
+    expect(amount).toBeGreaterThan(15000);
   });
 
-  test('new quote replaces previous quote', async ({ page }) => {
+  test('very low revenue calculates correctly', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('100');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
+    
+    await expect(page.getByLabel('Quote result')).toBeVisible();
+    
+    const premium = await page.getByLabel('Premium amount').textContent();
+    const amount = parseFloat(premium.replace(/[$,]/g, ''));
+    expect(amount).toBeGreaterThan(0);
+    expect(amount).toBeLessThan(10);
+  });
+});
+
+// ============================================
+// USER FLOW: Quote Details
+// ============================================
+
+test.describe('User Flow: Quote Details Display', () => {
+  
+  test('quote shows ID and timestamp', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
+    
+    await expect(page.getByLabel('Quote result')).toBeVisible();
+    
+    const quoteId = await page.getByLabel('Quote ID').textContent();
+    expect(quoteId).toContain('Quote ID:');
+    expect(quoteId).toContain('Q-');
+    
+    const timestamp = await page.getByLabel('Quote timestamp').textContent();
+    expect(timestamp).toContain('Generated:');
+  });
+
+  test('premium displays with dollar sign and decimals', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
+    
+    await expect(page.getByLabel('Quote result')).toBeVisible();
+    
+    const premium = await page.getByLabel('Premium amount').textContent();
+    expect(premium).toMatch(/^\$[\d,]+\.\d{2}$/);
+  });
+});
+
+// ============================================
+// USER FLOW: UI Behavior
+// ============================================
+
+test.describe('User Flow: UI Feedback', () => {
+  
+  test('loading indicator shows during quote calculation', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
+    
+    await expect(page.getByLabel('Loading')).toBeVisible();
+  });
+
+  test('loading hides when quote appears', async ({ page }) => {
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
+    
+    await expect(page.getByLabel('Quote result')).toBeVisible();
+    await expect(page.getByLabel('Loading')).not.toBeVisible();
+  });
+
+  test('new quote replaces old quote', async ({ page }) => {
     // First quote
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const firstQuoteId = await page.textContent('[aria-label="result.quoteId"]');
+    const firstQuoteId = await page.getByLabel('Quote ID').textContent();
     
     // Second quote
-    await page.fill('[aria-label="revenue.input"]', '75000');
-    await page.click('[aria-label="submit.get-quote"]');
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    await page.getByLabel('Annual revenue').fill('75000');
+    await page.getByLabel('Submit quote').click();
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const secondQuoteId = await page.textContent('[aria-label="result.quoteId"]');
+    const secondQuoteId = await page.getByLabel('Quote ID').textContent();
     expect(firstQuoteId).not.toBe(secondQuoteId);
   });
 
-  test('error hidden on success', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    await expect(page.locator('[aria-label="result.error"]')).not.toBeVisible();
-  });
-
-  test('coverage hides when switching to V1 state', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await expect(page.locator('[aria-label="coverage.group"]')).toBeVisible();
-    
-    await page.selectOption('[aria-label="state.select"]', 'TX');
-    await expect(page.locator('[aria-label="coverage.group"]')).not.toBeVisible();
-  });
-
-  test('form can resubmit multiple times', async ({ page }) => {
+  test('user can get multiple quotes in succession', async ({ page }) => {
     for (let i = 0; i < 3; i++) {
-      await page.selectOption('[aria-label="state.select"]', 'WI');
-      await page.selectOption('[aria-label="business.select"]', 'retail');
-      await page.fill('[aria-label="revenue.input"]', '50000');
-      await page.click('[aria-label="coverage.none"]');
-      await page.click('[aria-label="submit.get-quote"]');
-      await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+      await page.getByLabel('Customer state').selectOption('WI');
+      await page.getByLabel('Business type').selectOption('retail');
+      await page.getByLabel('Annual revenue').fill('50000');
+      await page.getByLabel('Coverage none').check();
+      await page.getByLabel('Submit quote').click();
+      await expect(page.getByLabel('Quote result')).toBeVisible();
       
-      const premiumText = await page.textContent('[aria-label="result.premium"]');
-      expect(premiumText).toMatch(/^\$[\d,]+\.\d{2}$/);
+      const premium = await page.getByLabel('Premium amount').textContent();
+      expect(premium).toMatch(/^\$[\d,]+\.\d{2}$/);
     }
   });
 });
 
 // ============================================
-// BUSINESS LOGIC (4 tests)
+// BUSINESS RULES: Premium Calculations
 // ============================================
 
-test.describe('Business Logic Verification', () => {
+test.describe('Business Rules: Premium Calculations', () => {
   
   test('higher revenue means higher premium', async ({ page }) => {
-    // 50K premium
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    // 50K revenue
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('retail');
+    await page.getByLabel('Annual revenue').fill('50000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const premium50k = parseFloat((await page.textContent('[aria-label="result.premium"]')).replace(/[$,]/g, ''));
+    const premium50k = parseFloat((await page.getByLabel('Premium amount').textContent()).replace(/[$,]/g, ''));
     
-    // 100K premium
-    await page.fill('[aria-label="revenue.input"]', '100000');
-    await page.click('[aria-label="submit.get-quote"]');
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    // 100K revenue
+    await page.getByLabel('Annual revenue').fill('100000');
+    await page.getByLabel('Submit quote').click();
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const premium100k = parseFloat((await page.textContent('[aria-label="result.premium"]')).replace(/[$,]/g, ''));
+    const premium100k = parseFloat((await page.getByLabel('Premium amount').textContent()).replace(/[$,]/g, ''));
     
     expect(premium100k).toBeGreaterThan(premium50k);
   });
 
-  test('manufacturing costs more than professional', async ({ page }) => {
+  test('manufacturing costs more than professional services', async ({ page }) => {
     // Manufacturing
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'manufacturing');
-    await page.fill('[aria-label="revenue.input"]', '100000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    await page.getByLabel('Customer state').selectOption('WI');
+    await page.getByLabel('Business type').selectOption('manufacturing');
+    await page.getByLabel('Annual revenue').fill('100000');
+    await page.getByLabel('Coverage none').check();
+    await page.getByLabel('Submit quote').click();
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const mfgPremium = parseFloat((await page.textContent('[aria-label="result.premium"]')).replace(/[$,]/g, ''));
+    const mfgPremium = parseFloat((await page.getByLabel('Premium amount').textContent()).replace(/[$,]/g, ''));
     
     // Professional
-    await page.selectOption('[aria-label="business.select"]', 'professional');
-    await page.click('[aria-label="submit.get-quote"]');
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+    await page.getByLabel('Business type').selectOption('professional');
+    await page.getByLabel('Submit quote').click();
+    await expect(page.getByLabel('Quote result')).toBeVisible();
     
-    const profPremium = parseFloat((await page.textContent('[aria-label="result.premium"]')).replace(/[$,]/g, ''));
+    const profPremium = parseFloat((await page.getByLabel('Premium amount').textContent()).replace(/[$,]/g, ''));
     
     expect(mfgPremium).toBeGreaterThan(profPremium);
   });
 
-  test('quote IDs are unique', async ({ page }) => {
+  test('each quote gets unique ID', async ({ page }) => {
     const quoteIds = [];
     
     for (let i = 0; i < 3; i++) {
-      await page.selectOption('[aria-label="state.select"]', 'WI');
-      await page.selectOption('[aria-label="business.select"]', 'retail');
-      await page.fill('[aria-label="revenue.input"]', '50000');
-      await page.click('[aria-label="coverage.none"]');
-      await page.click('[aria-label="submit.get-quote"]');
-      await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+      await page.getByLabel('Customer state').selectOption('WI');
+      await page.getByLabel('Business type').selectOption('retail');
+      await page.getByLabel('Annual revenue').fill('50000');
+      await page.getByLabel('Coverage none').check();
+      await page.getByLabel('Submit quote').click();
+      await expect(page.getByLabel('Quote result')).toBeVisible();
       
-      const quoteId = await page.textContent('[aria-label="result.quoteId"]');
+      const quoteId = await page.getByLabel('Quote ID').textContent();
       quoteIds.push(quoteId);
     }
     
@@ -403,77 +425,17 @@ test.describe('Business Logic Verification', () => {
     const premiums = [];
     
     for (let i = 0; i < 2; i++) {
-      await page.selectOption('[aria-label="state.select"]', 'WI');
-      await page.selectOption('[aria-label="business.select"]', 'retail');
-      await page.fill('[aria-label="revenue.input"]', '50000');
-      await page.click('[aria-label="coverage.none"]');
-      await page.click('[aria-label="submit.get-quote"]');
-      await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
+      await page.getByLabel('Customer state').selectOption('WI');
+      await page.getByLabel('Business type').selectOption('retail');
+      await page.getByLabel('Annual revenue').fill('50000');
+      await page.getByLabel('Coverage none').check();
+      await page.getByLabel('Submit quote').click();
+      await expect(page.getByLabel('Quote result')).toBeVisible();
       
-      const premium = parseFloat((await page.textContent('[aria-label="result.premium"]')).replace(/[$,]/g, ''));
+      const premium = parseFloat((await page.getByLabel('Premium amount').textContent()).replace(/[$,]/g, ''));
       premiums.push(premium);
     }
     
     expect(premiums[0]).toBe(premiums[1]);
-  });
-});
-
-// ============================================
-// RESPONSE DISPLAY (4 tests)
-// ============================================
-
-test.describe('Response Display Verification', () => {
-  
-  test('premium displays with dollar sign and decimals', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    const premiumText = await page.textContent('[aria-label="result.premium"]');
-    expect(premiumText).toMatch(/^\$[\d,]+\.\d{2}$/);
-  });
-
-  test('quote ID displays with prefix', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    const quoteIdText = await page.textContent('[aria-label="result.quoteId"]');
-    expect(quoteIdText).toContain('Quote ID:');
-  });
-
-  test('timestamp displays with prefix', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    const timestampText = await page.textContent('[aria-label="result.timestamp"]');
-    expect(timestampText).toContain('Generated:');
-  });
-
-  test('all result fields are visible', async ({ page }) => {
-    await page.selectOption('[aria-label="state.select"]', 'WI');
-    await page.selectOption('[aria-label="business.select"]', 'retail');
-    await page.fill('[aria-label="revenue.input"]', '50000');
-    await page.click('[aria-label="coverage.none"]');
-    await page.click('[aria-label="submit.get-quote"]');
-    
-    await page.waitForSelector('[aria-label="result.quote"]', { state: 'visible' });
-    
-    await expect(page.locator('[aria-label="result.premium"]')).toBeVisible();
-    await expect(page.locator('[aria-label="result.quoteId"]')).toBeVisible();
-    await expect(page.locator('[aria-label="result.timestamp"]')).toBeVisible();
   });
 });

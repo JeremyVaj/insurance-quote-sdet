@@ -9,10 +9,9 @@
 Automated test suite demonstrating **Thin App Model** testing strategy:
 
 1. **API Tests** - Backend contract validation (15 tests)
-2. **Integration Tests** - Flow-based UI tests with generic accessibility selectors (32 tests)
-3. **POM Example** - Optional classic Page Object Model (6 tests)
+2. **Integration Tests** - Flow-based UI tests with generic accessibility selectors (27 tests)
 
-**Total: 53 comprehensive tests**
+**Total: 42 comprehensive tests**
 
 **Key Innovation:** Tests use natural, screen-reader-friendly `aria-label` attributes as selectors - no test-specific IDs needed.
 
@@ -61,9 +60,8 @@ insurance-quote-sdet/
 │   │   ├── testData.js                        # Test data
 │   │   └── rating-engine.spec.js              # All API tests
 │   │
-│   └── integration/                            # Integration Tests (38 tests)
-│       ├── user-flows-refactored.spec.js      # 32 Thin App Model tests
-│       └── pom-example.spec.js                # 6 Classic POM tests (optional)
+│   └── integration/                            # Integration Tests (27 tests)
+│       └── user-flows.spec.js                 # Flow-based UI tests
 │
 ├── index.html                                  # Frontend with generic aria-labels
 ├── playwright.config.js                        # Test configuration
@@ -135,19 +133,19 @@ Backend contract validation - tests what UI cannot reach
 - ✅ Quote IDs are unique
 - ✅ Consistent pricing for same inputs
 
-### Integration Tests - Thin App Model (32 tests)
+### Integration Tests - Thin App Model (27 tests)
 
 Flow-based tests using generic accessibility selectors
 
 #### Form Validation (6 tests)
 - ✅ Button disabled on load
-- ✅ V1 states cannot submit (no coverage)
+- ✅ V1 states can submit without coverage
 - ✅ V2 states with all fields can submit
 - ✅ V1 notice shows
 - ✅ V2 coverage options show
 - ✅ Coverage hides when switching states
 
-#### Getting Quotes (8 tests)
+#### Getting Quotes (9 tests)
 - ✅ WI retail with no coverage
 - ✅ OH restaurant with silver coverage
 - ✅ IL professional with gold coverage
@@ -155,6 +153,7 @@ Flow-based tests using generic accessibility selectors
 - ✅ All 4 V2 states work
 - ✅ All 4 business types work
 - ✅ All 4 coverage levels work
+- ✅ V1 states work without coverage
 
 #### Edge Cases (3 tests)
 - ✅ Zero revenue → $0
@@ -175,16 +174,6 @@ Flow-based tests using generic accessibility selectors
 - ✅ Business type pricing
 - ✅ Unique quote IDs
 - ✅ Consistent premiums
-
-### Integration Tests - Classic POM Example (6 tests)
-
-Optional examples showing POM compatibility with generic labels
-
-- ✅ Button state management
-- ✅ Quote generation
-- ✅ Coverage visibility
-- ✅ Different coverage levels
-- ✅ Unique quote IDs
 
 ---
 
@@ -220,24 +209,10 @@ class RatingEngineAPI {
 
 **Why:** Simple, focused, easy to maintain
 
-### 3. Optional Classic POM for Compatibility
-
-```javascript
-class QuoteCalculatorPage {
-  async fillAndSubmitQuote({ state, businessType, revenue, coverage }) {
-    await this.page.getByLabel('Customer state').selectOption(state);
-    await this.page.getByLabel('Business type').selectOption(businessType);
-    // ... uses same generic labels
-  }
-}
-```
-
-**Why:** Shows Thin App Model works with or without POMs
-
-### 4. Flow-Based Test Organization
+### 3. Flow-Based Test Organization
 
 ```
-user-flows-refactored.spec.js → Organized by user journeys
+user-flows.spec.js → Organized by user journeys
   - User Flow: Form Validation
   - User Flow: Getting a Quote
   - User Flow: Edge Cases
