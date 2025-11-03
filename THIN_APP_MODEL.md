@@ -247,14 +247,32 @@ Total changes: 2 files, ~2 lines
 
 ### Scaling Comparison Table
 
-| Project Size | Traditional POM | Thin App Model | Savings |
-|--------------|-----------------|----------------|---------|
-| **5 tests, 1 page** | 200 lines | 60 lines | 70% |
-| **20 tests, 2 pages** | 480 lines | 240 lines | 50% |
-| **50 tests, 5 pages** | 1,280 lines | 600 lines | 53% |
-| **100 tests, 10 pages** | 2,800 lines | 1,200 lines | 57% |
+| Project Size | Traditional POM | Thin App Model | Lines Saved | Time Saved per Change |
+|--------------|-----------------|----------------|-------------|----------------------|
+| **5 tests, 1 page** | 200 lines | 60 lines | **140 lines** | 2 files → 2 files |
+| **20 tests, 2 pages** | 480 lines | 240 lines | **240 lines** | 3 files → 2 files |
+| **50 tests, 5 pages** | 1,280 lines | 600 lines | **680 lines** | 6 files → 5 files |
+| **100 tests, 10 pages** | 2,800 lines | 1,200 lines | **1,600 lines** | 11 files → 10 files |
 
-**Key Insight:** The more you scale, the more you save.
+**Key Insight:** The more you scale, the more lines you save (140 → 1,600 lines saved).
+
+---
+
+### Why The Savings Compound
+
+At small scale, the page object is relatively small overhead. But as you grow:
+
+**5 tests (1 page):**
+- Page Object: 50 lines
+- Tests: 150 lines  
+- Overhead: 50 lines (25% of total)
+
+**100 tests (10 pages):**
+- Page Objects: 1,000 lines (10 pages × 100 lines each)
+- Tests: 1,800 lines
+- Overhead: 1,000 lines (36% of total)
+
+**The abstraction layer grows linearly with pages, while test value stays constant.**
 
 ---
 
@@ -417,14 +435,15 @@ test('get quote', async ({ page }) => {
 
 ### Summary: Why Thin App Model Scales Better
 
-1. **Less Code** - No page object layer = 50-70% fewer lines
-2. **Fewer Files** - One file per feature, not two
-3. **Faster Changes** - Update HTML + test, not HTML + page object + test
-4. **Easier Debugging** - See exact selectors in tests
-5. **Lower Cognitive Load** - No jumping between files
-6. **Still Composable** - Extract helpers only when actually needed
+1. **More Savings at Scale** - Save 140 lines at 5 tests, 1,600 lines at 100 tests
+2. **Linear Growth vs Exponential** - Your test code grows, but no page object overhead
+3. **Fewer Files** - One file per feature, not two (or more)
+4. **Faster Changes** - Update HTML + test, not HTML + page object + test
+5. **Easier Debugging** - See exact selectors in tests
+6. **Lower Cognitive Load** - No jumping between files
+7. **Still Composable** - Extract helpers only when actually needed
 
-**The Bottom Line:** Traditional POM made sense when selectors were brittle. With stable `aria-label` selectors, the abstraction layer is unnecessary overhead.
+**The Bottom Line:** Traditional POM adds a fixed overhead per page (100+ lines). Thin App Model has zero overhead. At 10 pages, that's 1,000+ lines of pure overhead eliminated.
 
 ---
 
