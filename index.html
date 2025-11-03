@@ -1,525 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coverage Options Selector</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        html {
-            height: 100%;
-            overflow: hidden;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100%;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .company-logo {
-            position: absolute;
-            top: 15%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 2;
-        }
-        
-        .company-logo h1 {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: 48px;
-            font-weight: 700;
-            color: white;
-            margin: 0;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .company-logo .company-tagline {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.9);
-            margin-top: 10px;
-            font-style: italic;
-            letter-spacing: 4px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-        }
-        
-        .bubble {
-            position: absolute;
-            bottom: -100px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            opacity: 0.6;
-            animation: rise linear infinite;
-        }
-        
-        .bubble:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            left: 10%;
-            animation-duration: 15s;
-            animation-delay: 0s;
-        }
-        
-        .bubble:nth-child(2) {
-            width: 60px;
-            height: 60px;
-            left: 25%;
-            animation-duration: 12s;
-            animation-delay: 2s;
-        }
-        
-        .bubble:nth-child(3) {
-            width: 100px;
-            height: 100px;
-            left: 45%;
-            animation-duration: 18s;
-            animation-delay: 4s;
-        }
-        
-        .bubble:nth-child(4) {
-            width: 70px;
-            height: 70px;
-            left: 65%;
-            animation-duration: 14s;
-            animation-delay: 1s;
-        }
-        
-        .bubble:nth-child(5) {
-            width: 90px;
-            height: 90px;
-            left: 80%;
-            animation-duration: 16s;
-            animation-delay: 3s;
-        }
-        
-        .bubble:nth-child(6) {
-            width: 50px;
-            height: 50px;
-            left: 35%;
-            animation-duration: 13s;
-            animation-delay: 5s;
-        }
-        
-        .bubble:nth-child(7) {
-            width: 75px;
-            height: 75px;
-            left: 55%;
-            animation-duration: 17s;
-            animation-delay: 2.5s;
-        }
-        
-        @keyframes rise {
-            0% {
-                bottom: -100px;
-                transform: translateX(0);
-            }
-            50% {
-                transform: translateX(100px);
-            }
-            100% {
-                bottom: 110vh;
-                transform: translateX(-100px);
-            }
-        }
-        
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-        }
-        
-        .container {
-            background: white;
-            max-width: 650px;
-            width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            animation: slideIn 0.5s ease-out;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .company-logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .company-logo h1 {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: 36px;
-            font-weight: 700;
-            color: white;
-            margin: 0;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .company-logo .company-tagline {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.9);
-            margin-top: 8px;
-            font-style: italic;
-            letter-spacing: 3px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        h1 {
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 28px;
-            font-weight: 700;
-        }
-        
-        .subtitle {
-            color: #718096;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 30px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #4a5568;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        select {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            background-color: white;
-            color: #2d3748;
-            cursor: pointer;
-            transition: all 0.2s;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 40px;
-        }
-        
-        select:hover {
-            border-color: #cbd5e0;
-        }
-        
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .coverage-options {
-            display: none;
-            animation: fadeIn 0.4s ease-out;
-        }
-        
-        .coverage-options.visible {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        h2 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            font-size: 20px;
-            font-weight: 600;
-        }
-        
-        .coverage-option {
-            padding: 16px 20px;
-            margin: 12px 0;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: white;
-            position: relative;
-        }
-        
-        .coverage-option:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-        }
-        
-        .coverage-option.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #f7f9ff 0%, #e8ebff 100%);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-        
-        .coverage-option.selected::after {
-            content: "✓";
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #667eea;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .coverage-option input[type="radio"] {
-            width: auto;
-            margin-right: 12px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-        
-        .coverage-option strong {
-            color: #2d3748;
-            font-size: 16px;
-        }
-        
-        .coverage-option label {
-            display: inline;
-            font-weight: normal;
-            color: #718096;
-            cursor: pointer;
-            text-transform: none;
-            letter-spacing: normal;
-            font-size: 14px;
-            margin: 0;
-        }
-        
-        .info-message {
-            padding: 16px 20px;
-            margin: 20px 0;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
-            border-left: 4px solid #3b82f6;
-            color: #1e40af;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        .v1-warning {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left-color: #f59e0b;
-            color: #92400e;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .demo-footer {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 12px;
-            font-style: italic;
-            text-align: right;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            z-index: 10;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <title>Unified Quote & Coverage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #111827;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(102,126,234,0.45), transparent 60%),
+        radial-gradient(circle at 80% 30%, rgba(118,75,162,0.45), transparent 60%),
+        radial-gradient(circle at 50% 80%, rgba(102,126,234,0.35), transparent 70%),
+        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
+      background-size: cover;
+      overflow: hidden;
+      min-height: 100vh;
+    }
+    .card {
+      width: 100%;
+      max-width: 860px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 32px 36px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 2;
+    }
+    h1 { margin: 0 0 8px; font-size: 26px; font-weight: 800; color:#1e1e1e; }
+    .sub { color:#6b7280; margin-bottom: 20px; font-size:14px; }
+    fieldset { border: 0; padding: 0; margin: 0 0 18px; }
+    label { display:block; font-weight:600; margin:10px 0 6px; color:#374151; }
+    select, input[type="number"] {
+      width: 100%; padding: 12px 14px; border:1.8px solid #e5e7eb; border-radius:10px;
+      font-size: 16px; background:#fff; transition: border-color .2s, box-shadow .2s;
+    }
+    select:focus, input[type="number"]:focus {
+      outline:none; border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,0.15);
+    }
+    .notice {
+      background:#eef2ff; border-left:4px solid #4f46e5; padding:12px 14px;
+      border-radius:10px; color:#1e3a8a; font-size:14px;
+    }
+    .warn { background:#fff7ed; border-left-color:#f59e0b; color:#7c2d12; }
+    .coverage { display:none; margin-top: 10px; }
+    .coverage.visible { display:block; }
+    .coverage-option {
+      display:flex; gap:10px; align-items:center;
+      border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; margin:10px 0;
+      cursor:pointer; transition: all .2s;
+    }
+    .coverage-option:hover { border-color:#667eea; background:#f7f9ff; }
+    .coverage-option input { margin:0; }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 760px){ .row { grid-template-columns: 1fr; } }
+    .btn {
+      display:block; width:100%; padding:14px;
+      font-weight:700; color:#fff; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border:0; border-radius:10px; cursor:pointer; transition:transform .2s, opacity .2s;
+    }
+    .btn:hover { transform:translateY(-2px); }
+    .btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .result, .error, .loading {
+      display:none; margin-top: 16px; border-radius:10px; padding:12px 14px;
+    }
+    .result.show { display:block; background:#ecfeff; border-left:4px solid #06b6d4; }
+    .error.show  { display:block; background:#fef2f2; border-left:4px solid #ef4444; color:#991b1b; }
+    .loading.show { display:block; background:#eef2ff; border-left:4px solid #4f46e5; color:#312e81; }
+    .premium { font-size:28px; font-weight:800; color:#0ea5e9; margin:4px 0; }
+    .muted { font-size:12px; color:#6b7280; }
+  </style>
 </head>
 <body>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    
-    <div class="company-logo">
-        <h1>Very Good Insurance</h1>
-        <div class="company-tagline">EXCELLENCE IN COVERAGE</div>
-    </div>
-    
-    <div class="content-wrapper">
-        <div class="container">
-            <h1>Insurance Coverage Selector</h1>
-            <p class="subtitle">Choose your state to view available coverage options</p>
-            
-            <div class="form-group">
-                <label for="state-select">Select Your State:</label>
-                <select id="state-select" data-testid="state-select">
-                    <option value="">-- Select a State --</option>
-                    <option value="WI">Wisconsin (WI)</option>
-                    <option value="OH">Ohio (OH)</option>
-                    <option value="IL">Illinois (IL)</option>
-                    <option value="NV">Nevada (NV)</option>
-                    <option value="TX">Texas (TX)</option>
-                    <option value="NY">New York (NY)</option>
-                    <option value="CA">California (CA)</option>
-                </select>
-            </div>
+  <main class="card">
+    <h1 data-testid="page-title">Insurance Quote & Coverage</h1>
+    <div class="sub" data-testid="page-subtitle">Submit enabled only for V2 states with a coverage selected</div>
 
-            <div id="coverage-container" class="coverage-options" data-testid="coverage-container">
-                <h2>Select Coverage Option</h2>
-                <div class="info-message">
-                    🎉 New coverage options are available in your state!
-                </div>
-                
-                <div class="coverage-option" data-testid="coverage-none">
-                    <input type="radio" id="none" name="coverage" value="none" checked>
-                    <label for="none">
-                        <strong>None</strong> — No additional coverage
-                    </label>
-                </div>
-
-                <div class="coverage-option" data-testid="coverage-silver">
-                    <input type="radio" id="silver" name="coverage" value="silver">
-                    <label for="silver">
-                        <strong>Silver</strong> — Basic coverage package
-                    </label>
-                </div>
-
-                <div class="coverage-option" data-testid="coverage-gold">
-                    <input type="radio" id="gold" name="coverage" value="gold">
-                    <label for="gold">
-                        <strong>Gold</strong> — Enhanced coverage package
-                    </label>
-                </div>
-
-                <div class="coverage-option" data-testid="coverage-platinum">
-                    <input type="radio" id="platinum" name="coverage" value="platinum">
-                    <label for="platinum">
-                        <strong>Platinum</strong> — Premium coverage package
-                    </label>
-                </div>
-            </div>
-
-            <div id="v1-message" class="info-message v1-warning hidden" data-testid="v1-message">
-                ⚠️ Coverage options are currently available only in select states. Your state does not have access to these new options at this time.
-            </div>
+    <form id="quoteForm" data-testid="quote-form" novalidate>
+      <!-- State -->
+      <fieldset>
+        <label for="state" data-testid="state-label">Customer State</label>
+        <select id="state" data-testid="state-select" required>
+          <option value="">-- Select State --</option>
+          <option value="WI">Wisconsin (WI)</option>
+          <option value="OH">Ohio (OH)</option>
+          <option value="IL">Illinois (IL)</option>
+          <option value="NV">Nevada (NV)</option>
+          <option value="TX">Texas (TX)</option>
+          <option value="NY">New York (NY)</option>
+          <option value="CA">California (CA)</option>
+        </select>
+        <div id="v1Notice" class="notice warn" style="display:none" data-testid="v1-message">
+          New coverage options are not available in your state.
         </div>
-    </div>
-    
-    <div class="demo-footer">
-        * This is not a real insurance product. Demo project created by Jeremy Vajko.
-    </div>
+      </fieldset>
 
-    <script>
-        // Define V2 states (customers who see new coverage options)
-        const V2_STATES = ['WI', 'OH', 'IL', 'NV'];
-        
-        // Define V1 states (customers who do NOT see new coverage options)
-        const V1_STATES = ['TX', 'NY', 'CA'];
+      <!-- Coverage (only for V2) -->
+      <fieldset id="coverageFieldset" class="coverage" data-testid="coverage-container" aria-hidden="true">
+        <div class="notice" style="margin-bottom:10px">New coverage options are available in your state.</div>
 
-        const stateSelect = document.getElementById('state-select');
-        const coverageContainer = document.getElementById('coverage-container');
-        const v1Message = document.getElementById('v1-message');
-        const coverageOptions = document.querySelectorAll('.coverage-option');
+        <div class="coverage-option" data-testid="coverage-none">
+          <input type="radio" id="cov-none" name="coverage" value="none" checked />
+          <label for="cov-none"><strong>None</strong> — No additional coverage</label>
+        </div>
 
-        // Handle state selection change
-        stateSelect.addEventListener('change', function() {
-            const selectedState = this.value;
-            
-            if (!selectedState) {
-                // No state selected - hide everything
-                coverageContainer.classList.remove('visible');
-                v1Message.classList.add('hidden');
-                return;
-            }
+        <div class="coverage-option" data-testid="coverage-silver">
+          <input type="radio" id="cov-silver" name="coverage" value="silver" />
+          <label for="cov-silver"><strong>Silver</strong> — Basic coverage package</label>
+        </div>
 
-            if (V2_STATES.includes(selectedState)) {
-                // V2 customer - show coverage options
-                coverageContainer.classList.add('visible');
-                v1Message.classList.add('hidden');
-                
-                // Reset to "None" as default
-                document.getElementById('none').checked = true;
-                updateSelectedStyle();
-            } else if (V1_STATES.includes(selectedState)) {
-                // V1 customer - hide coverage options, show message
-                coverageContainer.classList.remove('visible');
-                v1Message.classList.remove('hidden');
-            }
+        <div class="coverage-option" data-testid="coverage-gold">
+          <input type="radio" id="cov-gold" name="coverage" value="gold" />
+          <label for="cov-gold"><strong>Gold</strong> — Enhanced coverage package</label>
+        </div>
+
+        <div class="coverage-option" data-testid="coverage-platinum">
+          <input type="radio" id="cov-platinum" name="coverage" value="platinum" />
+          <label for="cov-platinum"><strong>Platinum</strong> — Premium coverage package</label>
+        </div>
+      </fieldset>
+
+      <!-- Business & Revenue -->
+      <fieldset class="row">
+        <div>
+          <label for="business" data-testid="business-label">Business Type</label>
+          <select id="business" data-testid="business-select" required>
+            <option value="">-- Select Business Type --</option>
+            <option value="retail">Retail</option>
+            <option value="restaurant">Restaurant</option>
+            <option value="professional">Professional Services</option>
+            <option value="manufacturing">Manufacturing</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="revenue" data-testid="revenue-label">Annual Revenue ($)</label>
+          <input type="number" id="revenue" data-testid="revenue-input" inputmode="numeric" min="0" placeholder="50000" required />
+        </div>
+      </fieldset>
+
+      <!-- Submit -->
+      <button type="submit" class="btn" id="submitButton" data-testid="submit-button" disabled>Get Quote</button>
+
+      <!-- Feedback -->
+      <div class="loading" id="loading" data-testid="loading-indicator">Calculating your quote…</div>
+
+      <div class="result" id="quoteResult" data-testid="quote-result-container">
+        <div style="font-weight:700; margin-bottom:4px" data-testid="quote-result-title">Your Insurance Quote</div>
+        <div class="premium" data-testid="premium-amount">$0.00</div>
+        <div class="muted" data-testid="premium-label">Annual Premium</div>
+        <div class="muted" data-testid="quote-id-display">Quote ID:</div>
+        <div class="muted" data-testid="quote-timestamp"></div>
+      </div>
+
+      <div class="error" id="error" data-testid="error-container">
+        <strong data-testid="error-title">Error:</strong> <span id="errorText" data-testid="error-message"></span>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const V2_STATES = ['WI', 'OH', 'IL', 'NV']; // coverage available
+    const V1_STATES = ['TX', 'NY', 'CA'];       // coverage not available
+    const API_URL   = 'https://rating-api.jeremy-vajko.workers.dev/';
+
+    const form        = document.getElementById('quoteForm');
+    const stateSel    = document.getElementById('state');
+    const businessSel = document.getElementById('business');
+    const revenueInp  = document.getElementById('revenue');
+    const submitBtn   = document.getElementById('submitButton');
+
+    const coverageFs  = document.getElementById('coverageFieldset');
+    const v1Notice    = document.getElementById('v1Notice');
+
+    const loadingEl   = document.getElementById('loading');
+    const resultEl    = document.getElementById('quoteResult');
+    const premiumEl   = document.querySelector('[data-testid="premium-amount"]');
+    const quoteIdEl   = document.querySelector('[data-testid="quote-id-display"]');
+    const tsEl        = document.querySelector('[data-testid="quote-timestamp"]');
+    const errorEl     = document.getElementById('error');
+    const errorTextEl = document.getElementById('errorText');
+
+    function selectedCoverageValue() {
+      const checked = document.querySelector('input[name="coverage"]:checked');
+      return checked ? checked.value : null;
+    }
+
+    function updateCoverageVisibility() {
+      const st = stateSel.value;
+
+      // Always default to "None" when entering a V2 state
+      const none = document.getElementById('cov-none');
+      if (V2_STATES.includes(st) && none) {
+        none.checked = true;
+      }
+
+      if (V2_STATES.includes(st)) {
+        coverageFs.classList.add('visible');
+        coverageFs.setAttribute('aria-hidden', 'false');
+        v1Notice.style.display = 'none';
+      } else if (V1_STATES.includes(st)) {
+        coverageFs.classList.remove('visible');
+        coverageFs.setAttribute('aria-hidden', 'true');
+        v1Notice.style.display = 'block';
+      } else {
+        // Unknown/empty -> hide both
+        coverageFs.classList.remove('visible');
+        coverageFs.setAttribute('aria-hidden', 'true');
+        v1Notice.style.display = 'none';
+      }
+
+      updateSubmitEnabled();
+    }
+
+    function updateSubmitEnabled() {
+      const st         = stateSel.value;
+      const hasBusiness= businessSel.value !== '';
+      const hasRevenue = revenueInp.value !== '' && Number(revenueInp.value) >= 0;
+
+      // New rule: only enable submit for V2 states *and* when a coverage is selected
+      const isV2       = V2_STATES.includes(st);
+      const hasCoverage= !!selectedCoverageValue(); // "None" counts in V2
+
+      submitBtn.disabled = !(isV2 && hasCoverage && hasBusiness && hasRevenue);
+    }
+
+    stateSel.addEventListener('change', updateCoverageVisibility);
+    businessSel.addEventListener('change', updateSubmitEnabled);
+    revenueInp.addEventListener('input', updateSubmitEnabled);
+    document.querySelectorAll('input[name="coverage"]').forEach(r =>
+      r.addEventListener('change', updateSubmitEnabled)
+    );
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultEl.classList.remove('show');
+      errorEl.classList.remove('show');
+      loadingEl.classList.add('show');
+
+      const payload = {
+        revenue: Number(revenueInp.value),
+        state: stateSel.value,
+        business: businessSel.value
+        // Coverage is Story 2 UI only; not sent to Story 1 API
+      };
+
+      try {
+        const resp = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
+        const data = await resp.json();
+        loadingEl.classList.remove('show');
 
-        // Add visual feedback for selected coverage option
-        coverageOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const radio = this.querySelector('input[type="radio"]');
-                radio.checked = true;
-                updateSelectedStyle();
-            });
-        });
-
-        // Handle radio button changes
-        document.querySelectorAll('input[name="coverage"]').forEach(radio => {
-            radio.addEventListener('change', updateSelectedStyle);
-        });
-
-        function updateSelectedStyle() {
-            coverageOptions.forEach(option => {
-                const radio = option.querySelector('input[type="radio"]');
-                if (radio.checked) {
-                    option.classList.add('selected');
-                } else {
-                    option.classList.remove('selected');
-                }
-            });
+        if (resp.ok) {
+          premiumEl.textContent = `$${Number(data.premium).toFixed(2)}`;
+          quoteIdEl.textContent = `Quote ID: ${data.quoteId || ''}`;
+          tsEl.textContent = data.calculatedAt ? `Generated: ${new Date(data.calculatedAt).toLocaleString()}` : '';
+          resultEl.classList.add('show');
+        } else {
+          errorTextEl.textContent = data.message || data.error || 'Request failed';
+          errorEl.classList.add('show');
         }
+      } catch (err) {
+        loadingEl.classList.remove('show');
+        errorTextEl.textContent = 'Network error';
+        errorEl.classList.add('show');
+      }
+    });
 
-        // Initialize the selected style
-        updateSelectedStyle();
-    </script>
+    // Init
+    updateCoverageVisibility();
+    updateSubmitEnabled();
+  </script>
 </body>
 </html>
