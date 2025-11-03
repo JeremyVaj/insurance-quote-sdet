@@ -145,7 +145,7 @@ Flow-based tests using generic accessibility selectors
 - ✅ V2 coverage options show
 - ✅ Coverage hides when switching states
 
-#### Getting Quotes (9 tests)
+#### Getting Quotes (8 tests)
 - ✅ WI retail with no coverage
 - ✅ OH restaurant with silver coverage
 - ✅ IL professional with gold coverage

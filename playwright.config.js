@@ -29,11 +29,11 @@ export default defineConfig({
   projects: [
     {
       name: 'api-tests',
-      testMatch: /.*api.*\.spec\.js/,
+      testMatch: /.*\/api\/.*\.spec\.js/,
     },
     {
       name: 'integration-tests',
-      testMatch: /.*integration.*\.spec\.js/,
+      testMatch: /.*\/integration\/.*\.spec\.js/,
     },
   ],
 });
