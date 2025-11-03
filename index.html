@@ -2,91 +2,150 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Unified Quote & Coverage</title>
+  <title>Jeremy Very Good Insurance Company</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Space Mono font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
   <style>
-    html, body { height: 100%; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      color: #111827;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .space-mono-regular { font-family:"Space Mono",monospace; font-weight:400; font-style:normal; }
+    .space-mono-bold { font-family:"Space Mono",monospace; font-weight:700; font-style:normal; }
+    .space-mono-regular-italic { font-family:"Space Mono",monospace; font-weight:400; font-style:italic; }
+    .space-mono-bold-italic { font-family:"Space Mono",monospace; font-weight:700; font-style:italic; }
+
+    html,body{height:100%;margin:0;padding:0;font-size:115%;}
+    body{
+      font-family:"Space Mono",monospace;
+      color:#111827;
+      display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      overflow:hidden;min-height:100vh;padding:60px 20px 40px;
+    }
+
+    /* --- animated bubbles (start below viewport) --- */
+    .bubbles{
+      position:fixed;inset:0;overflow:hidden;z-index:-1;
       background:
-        radial-gradient(circle at 20% 20%, rgba(102,126,234,0.45), transparent 60%),
-        radial-gradient(circle at 80% 30%, rgba(118,75,162,0.45), transparent 60%),
-        radial-gradient(circle at 50% 80%, rgba(102,126,234,0.35), transparent 70%),
-        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      background-attachment: fixed;
-      background-size: cover;
-      overflow: hidden;
-      min-height: 100vh;
+        radial-gradient(circle at 20% 20%,rgba(102,126,234,0.45),transparent 60%),
+        radial-gradient(circle at 80% 30%,rgba(118,75,162,0.45),transparent 60%),
+        radial-gradient(circle at 50% 80%,rgba(102,126,234,0.35),transparent 70%);
+      pointer-events:none;
     }
-    .card {
-      width: 100%;
-      max-width: 860px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 16px;
-      padding: 32px 36px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(12px);
-      position: relative;
-      z-index: 2;
+    .bubble{
+      position:absolute;border-radius:50%;
+      background:rgba(255,255,255,0.15);
+      opacity:0;
+      transform:translateY(120vh); /* ensure off-screen on first paint */
+      animation:rise linear infinite;
+      will-change:transform,opacity;
     }
-    h1 { margin: 0 0 8px; font-size: 26px; font-weight: 800; color:#1e1e1e; }
-    .sub { color:#6b7280; margin-bottom: 20px; font-size:14px; }
-    fieldset { border: 0; padding: 0; margin: 0 0 18px; }
-    label { display:block; font-weight:600; margin:10px 0 6px; color:#374151; }
-    select, input[type="number"] {
-      width: 100%; padding: 12px 14px; border:1.8px solid #e5e7eb; border-radius:10px;
-      font-size: 16px; background:#fff; transition: border-color .2s, box-shadow .2s;
+    @keyframes rise{
+      0%   { transform:translateY(120vh) scale(0.6); opacity:0; }
+      12%  { opacity:0; }          /* keep hidden at start */
+      20%  { opacity:0.5; }        /* fade in after below viewport */
+      100% { transform:translateY(-20vh) scale(1.2); opacity:0; }
     }
-    select:focus, input[type="number"]:focus {
-      outline:none; border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,0.15);
+    /* sizes/positions/timing */
+    .bubble:nth-child(1){ width:80px;  height:80px;  left:10%; animation-duration:26s; animation-delay:0s; }
+    .bubble:nth-child(2){ width:40px;  height:40px;  left:30%; animation-duration:22s; animation-delay:3s; }
+    .bubble:nth-child(3){ width:60px;  height:60px;  left:55%; animation-duration:27s; animation-delay:6s; }
+    .bubble:nth-child(4){ width:100px; height:100px; left:70%; animation-duration:30s; animation-delay:2s; }
+    .bubble:nth-child(5){ width:50px;  height:50px;  left:85%; animation-duration:24s; animation-delay:8s; }
+    .bubble:nth-child(6){ width:120px; height:120px; left:15%; animation-duration:32s; animation-delay:12s; }
+    .bubble:nth-child(7){ width:90px;  height:90px;  left:45%; animation-duration:28s; animation-delay:16s; }
+    .bubble:nth-child(8){ width:70px;  height:70px;  left:65%; animation-duration:25s; animation-delay:20s; }
+    .bubble:nth-child(9){ width:60px;  height:60px;  left:80%; animation-duration:26s; animation-delay:10s; }
+    .bubble:nth-child(10){width:100px; height:100px; left:40%; animation-duration:33s; animation-delay:14s; }
+
+    header{text-align:center;margin-bottom:40px;line-height:1.1;}
+    header h1{
+      font-size:4.8rem;margin:0;
+      background:linear-gradient(135deg,#ffffff 0%,#dcd3ff 40%,#b09aff 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     }
-    .notice {
-      background:#eef2ff; border-left:4px solid #4f46e5; padding:12px 14px;
-      border-radius:10px; color:#1e3a8a; font-size:14px;
+    header h2{margin:12px 0 0;font-size:2.3rem;color:#f4f4ff;font-weight:400;}
+
+    .card{
+      width:100%;max-width:920px;
+      background:rgba(255,255,255,0.93);
+      border-radius:20px;padding:44px;
+      box-shadow:0 28px 80px rgba(0,0,0,0.25);
+      backdrop-filter:blur(12px);
     }
-    .warn { background:#fff7ed; border-left-color:#f59e0b; color:#7c2d12; }
-    .coverage { display:none; margin-top: 10px; }
-    .coverage.visible { display:block; }
-    .coverage-option {
-      display:flex; gap:10px; align-items:center;
-      border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; margin:10px 0;
-      cursor:pointer; transition: all .2s;
+
+    h3{margin:0 0 16px;font-size:32px;color:#1e1e1e;}
+    h3 span{background:linear-gradient(135deg,#667eea,#764ba2);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .sub{color:#6b7280;margin-bottom:28px;font-size:17px;}
+
+    fieldset{border:0;padding:0;margin:0 0 24px;}
+    label{display:block;margin:12px 0 8px;color:#374151;}
+
+    select,input[type="number"]{
+      width:100%;padding:16px 18px;
+      border:2px solid #e5e7eb;border-radius:12px;
+      font-size:18px;background:#fff;
+      transition:border-color .2s,box-shadow .2s;
+      font-family:"Space Mono",monospace;
     }
-    .coverage-option:hover { border-color:#667eea; background:#f7f9ff; }
-    .coverage-option input { margin:0; }
-    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 760px){ .row { grid-template-columns: 1fr; } }
-    .btn {
-      display:block; width:100%; padding:14px;
-      font-weight:700; color:#fff; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border:0; border-radius:10px; cursor:pointer; transition:transform .2s, opacity .2s;
+    select:focus,input[type="number"]:focus{
+      outline:none;border-color:#667eea;
+      box-shadow:0 0 0 3px rgba(102,126,234,0.15);
     }
-    .btn:hover { transform:translateY(-2px); }
-    .btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
-    .result, .error, .loading {
-      display:none; margin-top: 16px; border-radius:10px; padding:12px 14px;
-    }
-    .result.show { display:block; background:#ecfeff; border-left:4px solid #06b6d4; }
-    .error.show  { display:block; background:#fef2f2; border-left:4px solid #ef4444; color:#991b1b; }
-    .loading.show { display:block; background:#eef2ff; border-left:4px solid #4f46e5; color:#312e81; }
-    .premium { font-size:28px; font-weight:800; color:#0ea5e9; margin:4px 0; }
-    .muted { font-size:12px; color:#6b7280; }
+
+    .notice{background:#eef2ff;border-left:5px solid #4f46e5;
+      padding:14px 16px;border-radius:12px;color:#1e3a8a;font-size:15px;}
+    .warn{background:#fff7ed;border-left-color:#f59e0b;color:#7c2d12;}
+
+    .coverage{display:none;margin-top:12px;}
+    .coverage.visible{display:block;}
+    .coverage-option{display:flex;gap:12px;align-items:center;
+      border:2px solid #e5e7eb;border-radius:12px;
+      padding:14px 16px;margin:12px 0;cursor:pointer;transition:all .2s;}
+    .coverage-option:hover{border-color:#667eea;background:#f7f9ff;}
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    @media(max-width:760px){.row{grid-template-columns:1fr;}}
+
+    .btn{display:block;width:100%;padding:18px;
+      font-weight:700;color:#fff;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      border:0;border-radius:12px;cursor:pointer;
+      transition:transform .2s,opacity .2s;font-size:1.25rem;}
+    .btn:hover{transform:translateY(-2px);}
+    .btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+    .result,.error,.loading{display:none;margin-top:22px;border-radius:12px;padding:14px 16px;}
+    .result.show{display:block;background:#ecfeff;border-left:5px solid #06b6d4;}
+    .error.show{display:block;background:#fef2f2;border-left:5px solid #ef4444;color:#991b1b;}
+    .loading.show{display:block;background:#eef2ff;border-left:5px solid #4f46e5;color:#312e81;}
+    .premium{font-size:34px;color:#0ea5e9;font-weight:700;}
+    .muted{font-size:14px;color:#6b7280;}
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1 data-testid="page-title">Insurance Quote & Coverage</h1>
-    <div class="sub" data-testid="page-subtitle">Submit enabled only for V2 states with a coverage selected</div>
+  <div class="bubbles">
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  </div>
 
-    <form id="quoteForm" data-testid="quote-form" novalidate>
-      <!-- State -->
+  <header>
+    <h1 class="space-mono-bold">Jeremy</h1>
+    <h2 class="space-mono-regular-italic">Jeremy Very Good Insurance Company</h2>
+  </header>
+
+  <main class="card">
+    <h3 class="space-mono-bold-italic"><span>Insurance Quote & Coverage</span></h3>
+    <div class="sub space-mono-regular-italic">Submit enabled only for V2 states with a coverage selected</div>
+
+    <form id="quoteForm" novalidate aria-label="form.quote">
       <fieldset>
-        <label for="state" data-testid="state-label">Customer State</label>
-        <select id="state" data-testid="state-select" required>
+        <label for="state" class="space-mono-regular-italic">Customer State</label>
+        <select id="state" required aria-label="state.select">
           <option value="">-- Select State --</option>
           <option value="WI">Wisconsin (WI)</option>
           <option value="OH">Ohio (OH)</option>
@@ -96,41 +155,37 @@
           <option value="NY">New York (NY)</option>
           <option value="CA">California (CA)</option>
         </select>
-        <div id="v1Notice" class="notice warn" style="display:none" data-testid="v1-message">
+        <div id="v1Notice" class="notice warn" style="display:none" role="region" aria-label="message.v1">
           New coverage options are not available in your state.
         </div>
       </fieldset>
 
-      <!-- Coverage (only for V2) -->
-      <fieldset id="coverageFieldset" class="coverage" data-testid="coverage-container" aria-hidden="true">
-        <div class="notice" style="margin-bottom:10px">New coverage options are available in your state.</div>
-
-        <div class="coverage-option" data-testid="coverage-none">
-          <input type="radio" id="cov-none" name="coverage" value="none" checked />
+      <fieldset id="coverageFieldset" class="coverage" aria-hidden="true" role="radiogroup" aria-label="coverage.group">
+        <div class="notice space-mono-regular-italic" style="margin-bottom:10px">
+          New coverage options are available in your state.
+        </div>
+        <div class="coverage-option">
+          <input type="radio" id="cov-none" name="coverage" value="none" checked aria-label="coverage.none" />
           <label for="cov-none"><strong>None</strong> — No additional coverage</label>
         </div>
-
-        <div class="coverage-option" data-testid="coverage-silver">
-          <input type="radio" id="cov-silver" name="coverage" value="silver" />
+        <div class="coverage-option">
+          <input type="radio" id="cov-silver" name="coverage" value="silver" aria-label="coverage.silver" />
           <label for="cov-silver"><strong>Silver</strong> — Basic coverage package</label>
         </div>
-
-        <div class="coverage-option" data-testid="coverage-gold">
-          <input type="radio" id="cov-gold" name="coverage" value="gold" />
+        <div class="coverage-option">
+          <input type="radio" id="cov-gold" name="coverage" value="gold" aria-label="coverage.gold" />
           <label for="cov-gold"><strong>Gold</strong> — Enhanced coverage package</label>
         </div>
-
-        <div class="coverage-option" data-testid="coverage-platinum">
-          <input type="radio" id="cov-platinum" name="coverage" value="platinum" />
+        <div class="coverage-option">
+          <input type="radio" id="cov-platinum" name="coverage" value="platinum" aria-label="coverage.platinum" />
           <label for="cov-platinum"><strong>Platinum</strong> — Premium coverage package</label>
         </div>
       </fieldset>
 
-      <!-- Business & Revenue -->
       <fieldset class="row">
         <div>
-          <label for="business" data-testid="business-label">Business Type</label>
-          <select id="business" data-testid="business-select" required>
+          <label for="business" class="space-mono-regular-italic">Business Type</label>
+          <select id="business" required aria-label="business.select">
             <option value="">-- Select Business Type --</option>
             <option value="retail">Retail</option>
             <option value="restaurant">Restaurant</option>
@@ -138,147 +193,91 @@
             <option value="manufacturing">Manufacturing</option>
           </select>
         </div>
-
         <div>
-          <label for="revenue" data-testid="revenue-label">Annual Revenue ($)</label>
-          <input type="number" id="revenue" data-testid="revenue-input" inputmode="numeric" min="0" placeholder="50000" required />
+          <label for="revenue" class="space-mono-regular-italic">Annual Revenue ($)</label>
+          <input type="number" id="revenue" inputmode="numeric" min="0" placeholder="50000" required aria-label="revenue.input" />
         </div>
       </fieldset>
 
-      <!-- Submit -->
-      <button type="submit" class="btn" id="submitButton" data-testid="submit-button" disabled>Get Quote</button>
+      <button type="submit" class="btn" id="submitButton" disabled aria-label="submit.get-quote">
+        Get Quote
+      </button>
 
-      <!-- Feedback -->
-      <div class="loading" id="loading" data-testid="loading-indicator">Calculating your quote…</div>
-
-      <div class="result" id="quoteResult" data-testid="quote-result-container">
-        <div style="font-weight:700; margin-bottom:4px" data-testid="quote-result-title">Your Insurance Quote</div>
-        <div class="premium" data-testid="premium-amount">$0.00</div>
-        <div class="muted" data-testid="premium-label">Annual Premium</div>
-        <div class="muted" data-testid="quote-id-display">Quote ID:</div>
-        <div class="muted" data-testid="quote-timestamp"></div>
+      <div class="loading" id="loading" role="status" aria-live="polite" aria-label="result.loading">
+        Calculating your quote…
       </div>
 
-      <div class="error" id="error" data-testid="error-container">
-        <strong data-testid="error-title">Error:</strong> <span id="errorText" data-testid="error-message"></span>
+      <section class="result" id="quoteResult" role="region" aria-label="result.quote">
+        <div class="space-mono-bold-italic" style="margin-bottom:6px;">Your Insurance Quote</div>
+        <div class="premium space-mono-bold" aria-label="result.premium">$0.00</div>
+        <div class="muted space-mono-regular-italic">Annual Premium</div>
+        <div class="muted" aria-label="result.quoteId">Quote ID:</div>
+        <div class="muted" aria-label="result.timestamp"></div>
+      </section>
+
+      <div class="error" id="error" role="region" aria-label="result.error">
+        <strong>Error:</strong> <span id="errorText" aria-label="result.error.message"></span>
       </div>
     </form>
   </main>
 
   <script>
-    const V2_STATES = ['WI', 'OH', 'IL', 'NV']; // coverage available
-    const V1_STATES = ['TX', 'NY', 'CA'];       // coverage not available
-    const API_URL   = 'https://rating-api.jeremy-vajko.workers.dev/';
+    const V2=['WI','OH','IL','NV'],V1=['TX','NY','CA'];
+    const API='https://rating-api.jeremy-vajko.workers.dev/';
+    const f=document.getElementById('quoteForm'),
+          s=document.getElementById('state'),
+          b=document.getElementById('business'),
+          r=document.getElementById('revenue'),
+          btn=document.getElementById('submitButton'),
+          c=document.getElementById('coverageFieldset'),
+          n=document.getElementById('v1Notice'),
+          load=document.getElementById('loading'),
+          res=document.getElementById('quoteResult'),
+          prem=res.querySelector('[aria-label="result.premium"]'),
+          qid=res.querySelector('[aria-label="result.quoteId"]'),
+          ts=res.querySelector('[aria-label="result.timestamp"]'),
+          err=document.getElementById('error'),
+          errTxt=document.getElementById('errorText');
 
-    const form        = document.getElementById('quoteForm');
-    const stateSel    = document.getElementById('state');
-    const businessSel = document.getElementById('business');
-    const revenueInp  = document.getElementById('revenue');
-    const submitBtn   = document.getElementById('submitButton');
-
-    const coverageFs  = document.getElementById('coverageFieldset');
-    const v1Notice    = document.getElementById('v1Notice');
-
-    const loadingEl   = document.getElementById('loading');
-    const resultEl    = document.getElementById('quoteResult');
-    const premiumEl   = document.querySelector('[data-testid="premium-amount"]');
-    const quoteIdEl   = document.querySelector('[data-testid="quote-id-display"]');
-    const tsEl        = document.querySelector('[data-testid="quote-timestamp"]');
-    const errorEl     = document.getElementById('error');
-    const errorTextEl = document.getElementById('errorText');
-
-    function selectedCoverageValue() {
-      const checked = document.querySelector('input[name="coverage"]:checked');
-      return checked ? checked.value : null;
+    function covVal(){const x=document.querySelector('input[name="coverage"]:checked');return x?x.value:null;}
+    function showHide(){
+      const val=s.value;
+      if(V2.includes(val)){c.classList.add('visible');c.setAttribute('aria-hidden','false');n.style.display='none';}
+      else if(V1.includes(val)){c.classList.remove('visible');c.setAttribute('aria-hidden','true');n.style.display='block';}
+      else{c.classList.remove('visible');c.setAttribute('aria-hidden','true');n.style.display='none';}
+      toggleBtn();
     }
-
-    function updateCoverageVisibility() {
-      const st = stateSel.value;
-
-      // Always default to "None" when entering a V2 state
-      const none = document.getElementById('cov-none');
-      if (V2_STATES.includes(st) && none) {
-        none.checked = true;
-      }
-
-      if (V2_STATES.includes(st)) {
-        coverageFs.classList.add('visible');
-        coverageFs.setAttribute('aria-hidden', 'false');
-        v1Notice.style.display = 'none';
-      } else if (V1_STATES.includes(st)) {
-        coverageFs.classList.remove('visible');
-        coverageFs.setAttribute('aria-hidden', 'true');
-        v1Notice.style.display = 'block';
-      } else {
-        // Unknown/empty -> hide both
-        coverageFs.classList.remove('visible');
-        coverageFs.setAttribute('aria-hidden', 'true');
-        v1Notice.style.display = 'none';
-      }
-
-      updateSubmitEnabled();
+    function toggleBtn(){
+      const ready=V2.includes(s.value)&&covVal()&&b.value!==''&&r.value!==''&&Number(r.value)>=0;
+      btn.disabled=!ready;
     }
-
-    function updateSubmitEnabled() {
-      const st         = stateSel.value;
-      const hasBusiness= businessSel.value !== '';
-      const hasRevenue = revenueInp.value !== '' && Number(revenueInp.value) >= 0;
-
-      // New rule: only enable submit for V2 states *and* when a coverage is selected
-      const isV2       = V2_STATES.includes(st);
-      const hasCoverage= !!selectedCoverageValue(); // "None" counts in V2
-
-      submitBtn.disabled = !(isV2 && hasCoverage && hasBusiness && hasRevenue);
-    }
-
-    stateSel.addEventListener('change', updateCoverageVisibility);
-    businessSel.addEventListener('change', updateSubmitEnabled);
-    revenueInp.addEventListener('input', updateSubmitEnabled);
-    document.querySelectorAll('input[name="coverage"]').forEach(r =>
-      r.addEventListener('change', updateSubmitEnabled)
-    );
-
-    form.addEventListener('submit', async (e) => {
+    [s,b,r].forEach(el=>el.addEventListener('input',toggleBtn));
+    s.addEventListener('change',showHide);
+    document.querySelectorAll('input[name="coverage"]').forEach(x=>x.addEventListener('change',toggleBtn));
+    f.addEventListener('submit',async e=>{
       e.preventDefault();
-      resultEl.classList.remove('show');
-      errorEl.classList.remove('show');
-      loadingEl.classList.add('show');
-
-      const payload = {
-        revenue: Number(revenueInp.value),
-        state: stateSel.value,
-        business: businessSel.value
-        // Coverage is Story 2 UI only; not sent to Story 1 API
-      };
-
-      try {
-        const resp = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await resp.json();
-        loadingEl.classList.remove('show');
-
-        if (resp.ok) {
-          premiumEl.textContent = `$${Number(data.premium).toFixed(2)}`;
-          quoteIdEl.textContent = `Quote ID: ${data.quoteId || ''}`;
-          tsEl.textContent = data.calculatedAt ? `Generated: ${new Date(data.calculatedAt).toLocaleString()}` : '';
-          resultEl.classList.add('show');
-        } else {
-          errorTextEl.textContent = data.message || data.error || 'Request failed';
-          errorEl.classList.add('show');
+      res.classList.remove('show');err.classList.remove('show');load.classList.add('show');
+      const payload={revenue:Number(r.value),state:s.value,business:b.value};
+      try{
+        const resp=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+        const data=await resp.json();load.classList.remove('show');
+        if(resp.ok){
+          prem.textContent=`$${Number(data.premium).toFixed(2)}`;
+          qid.textContent=`Quote ID: ${data.quoteId||''}`;
+          ts.textContent=data.calculatedAt?`Generated: ${new Date(data.calculatedAt).toLocaleString()}`:'';
+          res.classList.add('show');
+        }else{
+          errTxt.textContent=data.message||data.error||'Request failed';err.classList.add('show');
         }
-      } catch (err) {
-        loadingEl.classList.remove('show');
-        errorTextEl.textContent = 'Network error';
-        errorEl.classList.add('show');
+      }catch{
+        load.classList.remove('show');errTxt.textContent='Network error';err.classList.add('show');
       }
     });
-
-    // Init
-    updateCoverageVisibility();
-    updateSubmitEnabled();
+    showHide();toggleBtn();
   </script>
+  <footer style="margin-top:40px;text-align:center;font-size:14px;color:#d1d5db;font-family:'Space Mono',monospace;">
+  <em>For more information about purchasing your quoted price, contact <a href="https://jeremyvajko.com" style="color:#a5b4fc;text-decoration:none;">JeremyVajko.com</em>
+</footer>
+
 </body>
 </html>
