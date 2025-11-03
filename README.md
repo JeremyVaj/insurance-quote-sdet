@@ -60,7 +60,11 @@ insurance-quote-sdet/
 ### Installation
 
 ```bash
+# Install dependencies
 npm install
+
+# Install Playwright browsers (REQUIRED for integration tests)
+npx playwright install
 ```
 
 ### Run Tests
