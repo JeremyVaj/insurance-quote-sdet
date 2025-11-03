@@ -70,11 +70,16 @@
 
     header{text-align:center; margin-bottom:20px; line-height:1.1;}
     header h1{
-      font-size:3.2rem; margin:0;
+      font-size:3.6rem; margin:0;
       background:linear-gradient(135deg,#ffffff 0%,#dcd3ff 40%,#b09aff 100%);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
     }
-    header h2{ margin:8px 0 0; font-size:1.6rem; color:#f4f4ff; font-weight:400; }
+    header h2{
+      margin:8px 0 0;
+      font-size:2rem;
+      color:#f4f4ff;
+      font-weight:400;
+    }
 
     .card{
       width:100%; max-width:920px;
@@ -93,11 +98,15 @@
     label{ display:block; margin:10px 0 6px; color:#374151; font-size:14px; }
 
     select, input[type="number"]{
-      width:100%; padding:12px 14px;
-      border:2px solid #e5e7eb; border-radius:12px;
-      font-size:16px; background:#fff;
+      width:100%;
+      padding:12px 14px;
+      border:2px solid #e5e7eb;
+      border-radius:12px;
+      font-size:16px;
+      background:#fff;
       transition:border-color .2s, box-shadow .2s;
       font-family:"Space Mono",monospace;
+      box-sizing:border-box; /* keep boxes inside their grid cell */
     }
     select:focus, input[type="number"]:focus{
       outline:none; border-color:#667eea;
@@ -160,13 +169,15 @@
   </div>
 
   <header>
-    <h1 class="space-mono-bold">Jeremy's</h1>
-    <h2 class="space-mono-regular-italic">Very Good Insurance Company</h2>
+    <h1 class="space-mono-bold">Jeremy</h1>
+    <h2 class="space-mono-regular-italic">Jeremy Very Good Insurance Company</h2>
   </header>
 
   <main class="card">
     <h3 class="space-mono-bold-italic"><span>Insurance Quote & Coverage</span></h3>
-    <div class="sub space-mono-regular-italic">The best deals by a trusted guy named Jeremy</div>
+    <div class="sub space-mono-regular-italic">
+      Get a very good quote from a very good company run by a very good guy named Jeremy.
+    </div>
 
     <form id="quoteForm" novalidate aria-label="form.quote">
       <fieldset>
@@ -182,7 +193,7 @@
           <option value="CA">California (CA)</option>
         </select>
         <div id="v1Notice" class="notice warn" style="display:none" role="region" aria-label="message.v1">
-          New coverage options are not available in your state.
+          New coverage options are not available in your state, but your quote will still be very good.
         </div>
       </fieldset>
 
@@ -249,8 +260,9 @@
 
   <footer>
     <em>
-      For more information about purchasing your quoted price, contact Jeremy at 
-      <a href="https://jeremyvajko.com"> JeremyVajko.com</a> 
+      For more information about purchasing your quoted price, contact Jeremy at
+      <a href="https://jeremyvajko.com">JeremyVajko.com</a> —
+      though he'll probably tell you he doesn't actually sell insurance, because this is just a demo project.
     </em>
   </footer>
 
@@ -272,41 +284,75 @@
           err=document.getElementById('error'),
           errTxt=document.getElementById('errorText');
 
-    function covVal(){const x=document.querySelector('input[name="coverage"]:checked');return x?x.value:null;}
+    function covVal(){
+      const x=document.querySelector('input[name="coverage"]:checked');
+      return x?x.value:null;
+    }
+
     function showHide(){
       const val=s.value;
-      if(V2.includes(val)){c.classList.add('visible');c.setAttribute('aria-hidden','false');n.style.display='none';}
-      else if(V1.includes(val)){c.classList.remove('visible');c.setAttribute('aria-hidden','true');n.style.display='block';}
-      else{c.classList.remove('visible');c.setAttribute('aria-hidden','true');n.style.display='none';}
+      if(V2.includes(val)){
+        c.classList.add('visible');
+        c.setAttribute('aria-hidden','false');
+        n.style.display='none';
+      } else if(V1.includes(val)){
+        c.classList.remove('visible');
+        c.setAttribute('aria-hidden','true');
+        n.style.display='block';
+      } else {
+        c.classList.remove('visible');
+        c.setAttribute('aria-hidden','true');
+        n.style.display='none';
+      }
       toggleBtn();
     }
+
     function toggleBtn(){
-      const ready=V2.includes(s.value)&&covVal()&&b.value!==''&&r.value!==''&&Number(r.value)>=0;
-      btn.disabled=!ready;
+      const hasBasics = b.value!=='' && r.value!=='' && Number(r.value)>=0;
+      const isV2 = V2.includes(s.value);
+      const isV1 = V1.includes(s.value);
+
+      const ready = (isV2 && covVal() && hasBasics) || (isV1 && hasBasics);
+      btn.disabled = !ready;
     }
+
     [s,b,r].forEach(el=>el.addEventListener('input',toggleBtn));
     s.addEventListener('change',showHide);
     document.querySelectorAll('input[name="coverage"]').forEach(x=>x.addEventListener('change',toggleBtn));
+
     f.addEventListener('submit',async e=>{
       e.preventDefault();
-      res.classList.remove('show');err.classList.remove('show');load.classList.add('show');
+      res.classList.remove('show');
+      err.classList.remove('show');
+      load.classList.add('show');
+
       const payload={revenue:Number(r.value),state:s.value,business:b.value};
       try{
-        const resp=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-        const data=await resp.json();load.classList.remove('show');
+        const resp=await fetch(API,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        });
+        const data=await resp.json();
+        load.classList.remove('show');
         if(resp.ok){
           prem.textContent=`$${Number(data.premium).toFixed(2)}`;
           qid.textContent=`Quote ID: ${data.quoteId||''}`;
           ts.textContent=data.calculatedAt?`Generated: ${new Date(data.calculatedAt).toLocaleString()}`:'';
           res.classList.add('show');
         }else{
-          errTxt.textContent=data.message||data.error||'Request failed';err.classList.add('show');
+          errTxt.textContent=data.message||data.error||'Request failed';
+          err.classList.add('show');
         }
       }catch{
-        load.classList.remove('show');errTxt.textContent='Network error';err.classList.add('show');
+        load.classList.remove('show');
+        errTxt.textContent='Network error';
+        err.classList.add('show');
       }
     });
-    showHide();toggleBtn();
+
+    showHide();
+    toggleBtn();
   </script>
 </body>
 </html>
