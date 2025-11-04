@@ -18,12 +18,9 @@ export default defineConfig({
   ],
   
   use: {
-    baseURL: process.env.API_BASE_URL || 'https://rating-api.jeremy-vajko.workers.dev/',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    extraHTTPHeaders: {
-      'Accept': 'application/json',
-    },
+    video: 'off',
   },
 
   projects: [

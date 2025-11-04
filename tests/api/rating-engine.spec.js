@@ -4,7 +4,7 @@
 
 import { test, expect } from '@playwright/test';
 
-const API_URL = process.env.API_BASE_URL || 'https://rating-api.jeremy-vajko.workers.dev/';
+const API_URL = process.env.API_BASE_URL || 'https://rating-api.jeremy-vajko.workers.dev/rate';
 
 // ============================================
 // VALIDATION TESTS (10 tests)

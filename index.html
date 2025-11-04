@@ -237,7 +237,7 @@
         Calculating your quote…
       </div>
 
-      <section class="result" id="quoteResult" role="region" aria-label="Quote result">
+      <section class="result" id="quoteResult" role="region" aria-label="Quote result" aria-live="polite">
         <div class="space-mono-bold-italic" style="margin-bottom:6px;">Your Insurance Quote</div>
         <div class="premium space-mono-bold" aria-label="Premium amount">$0.00</div>
         <div class="muted space-mono-regular-italic">Annual Premium</div>
@@ -260,7 +260,7 @@
 
   <script>
     const V2=['WI','OH','IL','NV'],V1=['TX','NY','CA'];
-    const API='https://rating-api.jeremy-vajko.workers.dev/';
+    const API='https://rating-api.jeremy-vajko.workers.dev/rate';
     const f=document.getElementById('quoteForm'),
           s=document.getElementById('state'),
           b=document.getElementById('business'),

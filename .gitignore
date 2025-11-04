@@ -3,6 +3,5 @@ playwright-report/
 test-results/
 .DS_Store
 .env
-package-lock.json
 *.log
 .playwright/

@@ -101,6 +101,25 @@ npm run test:headed
 npm run report
 ```
 
+### Environment Variables
+
+Tests run against live deployed endpoints by default. You can override for local development or staging:
+
+```bash
+# Frontend URL (integration tests)
+# Default: https://insurance-demo.jeremyvajko.com
+export FRONTEND_URL=http://localhost:3000
+
+# API endpoint (API tests)
+# Default: https://rating-api.jeremy-vajko.workers.dev/rate
+export API_BASE_URL=http://localhost:8787/rate
+
+# Run tests with custom endpoints
+FRONTEND_URL=https://staging.example.com npm test
+```
+
+**Note:** The live demo does not implement coverage pricing logic. Coverage selection is a UI-only feature that demonstrates the Thin App Model approach but doesn't affect the actual premium calculation from the API.
+
 ---
 
 ## 📋 Test Coverage
@@ -238,13 +257,14 @@ user-flows.spec.js → Organized by user journeys
 
 ## 📝 Notes
 
-- **API URL:** `https://rating-api.jeremy-vajko.workers.dev/`
-- **Frontend:** File-based (index.html) with animated bubbles and Space Mono font
+- **Live Demo:** https://insurance-demo.jeremyvajko.com
+- **API Endpoint:** https://rating-api.jeremy-vajko.workers.dev/rate
 - **Test Framework:** Playwright
 - **Language:** JavaScript (ES6 modules)
-- **V2 States:** WI, OH, IL, NV (require coverage selection to enable submit)
+- **V2 States:** WI, OH, IL, NV (show coverage options in UI)
 - **V1 States:** TX, NY, CA (no coverage options available)
-- **Accessibility:** Uses aria-label attributes for screen reader support
+- **Coverage Behavior:** Coverage selection is UI-only and does not affect premium calculation
+- **Accessibility:** All elements use aria-label attributes for screen reader support
 
 ---
 

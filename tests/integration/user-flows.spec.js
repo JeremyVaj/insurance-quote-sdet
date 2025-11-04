@@ -6,11 +6,8 @@
 // Tests describe user flows, not implementation details
 
 import { test, expect } from '@playwright/test';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const FRONTEND_URL = 'file://' + path.resolve(__dirname, '../../index.html');
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://insurance-demo.jeremyvajko.com';
 
 // V2 states have coverage options, V1 states don't
 const V2_STATES = ['WI', 'OH', 'IL', 'NV'];
