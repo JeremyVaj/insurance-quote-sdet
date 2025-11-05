@@ -116,10 +116,6 @@ export API_BASE_URL=http://localhost:8787/rate
 
 # Run tests with custom endpoints
 FRONTEND_URL=https://staging.example.com npm test
-```
-
-**Note:** The live demo does not implement coverage pricing logic. Coverage selection is a UI-only feature that demonstrates the Thin App Model approach but doesn't affect the actual premium calculation from the API.
-
 ---
 
 ## 📋 Test Coverage
