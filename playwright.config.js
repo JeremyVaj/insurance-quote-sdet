@@ -1,5 +1,13 @@
 // playwright.config.js
 // Playwright Test Configuration
+// 
+// USAGE:
+// - Run all tests: npm test
+// - Run API only: npm run test:api
+// - Run integration only: npm run test:integration
+// - Run with Spanish: LOCALE=es npm test
+// - Run against local file: npm test (uses index.html by default)
+// - Run against remote: FRONTEND_URL=https://example.com npm test
 
 import { defineConfig } from '@playwright/test';
 
@@ -27,10 +35,20 @@ export default defineConfig({
     {
       name: 'api-tests',
       testMatch: /.*\/api\/.*\.spec\.js/,
+      use: {
+        // API tests use environment variable or default endpoint
+        // Set API_BASE_URL to override: API_BASE_URL=http://localhost:4000/rate npm run test:api
+      },
     },
     {
       name: 'integration-tests',
       testMatch: /.*\/integration\/.*\.spec\.js/,
+      use: {
+        // Integration tests use environment variable or local file
+        // FRONTEND_URL defaults to file://[project]/index.html in test file
+        // Override with: FRONTEND_URL=https://example.com npm run test:integration
+        // Locale: LOCALE=es npm run test:integration
+      },
     },
   ],
 });
