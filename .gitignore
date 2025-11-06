@@ -5,3 +5,4 @@ test-results/
 .env
 *.log
 .playwright/
+package-lock.json
